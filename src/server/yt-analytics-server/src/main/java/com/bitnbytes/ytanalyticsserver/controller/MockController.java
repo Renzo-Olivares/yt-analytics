@@ -33,6 +33,7 @@ public class MockController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String addData(@RequestBody String newData){
+        System.out.printf("Adding new data: %s%n", newData);
         return (mockService.addData(newData));
     }
 }

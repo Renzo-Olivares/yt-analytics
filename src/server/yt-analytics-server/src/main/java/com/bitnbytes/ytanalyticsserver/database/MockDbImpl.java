@@ -13,7 +13,7 @@ public class MockDbImpl {
     @Autowired
     public MockDbImpl(){
         mockData.add("PewdiePie");
-        mockData.add("Mr.Beat");
+        mockData.add("Mr.Beast");
         mockData.add("KSI");
         mockData.add("Marques Brownlee");
         mockData.add("Linus Tech Tips");

@@ -16,6 +16,9 @@ public class YtAnalyticsServerApplication {
         SpringApplication.run(YtAnalyticsServerApplication.class, args);
     }
 
+    // Solution for the following issue
+    // CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource
+    // https://medium.com/@ashrithgn/spring-config-to-disable-cors-in-spring-boot-fd43bb4bbfa8
     @Configuration
     public class CORSAdvice {
         @Bean
