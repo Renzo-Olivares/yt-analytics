@@ -23,6 +23,7 @@ public class MockController {
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ResponseEntity<List<String>> getMockData(){
+        System.out.println("Client requesting mock data from server");
         return new ResponseEntity<>(mockService.getMockData(), HttpStatus.OK);
     }
 
