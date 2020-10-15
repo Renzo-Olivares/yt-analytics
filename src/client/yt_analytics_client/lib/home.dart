@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:yt_analytics_client/models/mockmodel.dart';
 import 'package:yt_analytics_client/services/mockservice.dart';
 
+typedef onDataUpdate = void Function();
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -21,8 +23,16 @@ class _HomeState extends State<Home> {
     futureData = fetchServerInfo();
   }
 
+  void _updateData() {
+    setState(() {
+      futureData = fetchServerInfo();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    onDataUpdate updateData = _updateData;
+
     return Scaffold(
       body: Row(
         children: [
@@ -52,6 +62,7 @@ class _HomeState extends State<Home> {
                 Expanded(
                   child: MockPage(
                     mockModel: futureData,
+                    updater: updateData,
                   ),
                 ),
               ],
@@ -63,11 +74,18 @@ class _HomeState extends State<Home> {
   }
 }
 
-class MockPage extends StatelessWidget {
-  MockPage({this.mockModel});
+class MockPage extends StatefulWidget {
+  MockPage({this.mockModel, this.updater});
 
-  final _addEntryController = TextEditingController();
   final Future<MockModel> mockModel;
+  final onDataUpdate updater;
+
+  @override
+  _MockPageState createState() => _MockPageState();
+}
+
+class _MockPageState extends State<MockPage> {
+  final _addEntryController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +93,7 @@ class MockPage extends StatelessWidget {
       children: [
         Expanded(
           child: FutureBuilder(
-            future: this.mockModel,
+            future: this.widget.mockModel,
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
@@ -110,7 +128,10 @@ class MockPage extends StatelessWidget {
               ),
               OutlinedButton(
                 child: Text('Add entry'),
-                onPressed: () => addData(_addEntryController.text),
+                onPressed: () {
+                  addData(_addEntryController.text);
+                  widget.updater();
+                },
                 style: OutlinedButton.styleFrom(elevation: 2),
               ),
             ],

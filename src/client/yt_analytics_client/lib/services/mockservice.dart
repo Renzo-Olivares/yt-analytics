@@ -14,6 +14,7 @@ Future<MockModel> fetchServerInfo() async {
     print('response good');
     List<String> responseJson =
         (json.decode(response.body) as List<dynamic>).cast<String>();
+    print('Mock data received from server: $responseJson');
 
     return MockModel(mockData: responseJson);
   } else {
