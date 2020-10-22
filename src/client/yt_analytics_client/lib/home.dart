@@ -25,15 +25,15 @@ class _HomeState extends State<Home> {
     futureData = fetchServerInfo();
   }
 
-  void _updateData() {
-    setState(() {
-      futureData = fetchServerInfo();
-    });
-  }
+  // void _updateData() {
+  //   setState(() {
+  //     futureData = fetchServerInfo();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    onDataUpdate updateData = _updateData;
+    // onDataUpdate updateData = _updateData;
 
     return Scaffold(
       appBar: AppBar(
