@@ -33,25 +33,25 @@ class _FilterSelectionState extends State<FilterSelection> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 8),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.filter_list_outlined),
-              SizedBox(width: 8),
-              Text(
-                'FILTER',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
+    return ExpansionTile(
+      leading: Icon(Icons.filter_list_outlined),
+      title: Text(
+        'FILTER',
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1
+            .copyWith(fontWeight: FontWeight.bold),
+      ),
+      trailing: SizedBox(),
+      children: [
+        Padding(
+          padding: const EdgeInsetsDirectional.only(
+            start: 40,
+            end: 40,
+            top: 16,
+            bottom: 16,
           ),
-          SizedBox(height: 32),
-          Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -143,8 +143,8 @@ class _FilterSelectionState extends State<FilterSelection> {
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
