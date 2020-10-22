@@ -4,37 +4,38 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class CSV_Reader {
-	// File (data - rows X columns)
-	private ArrayList<ArrayList<String>> data;
-	private static final String CSV_SPLIT_BY = ",";
-	
+	private ArrayList<Entry> data;
 
 	public CSV_Reader() {
-		data = new ArrayList<ArrayList<String>>();
+		data = new ArrayList<Entry>();
 	}
 
-	public void read(String file) throws IOException{
-    	System.out.println("Removing old data");
-        data.clear();
-        System.out.println("Old data removed\nReading in new data");
-        String line = "";
+	public void read(String file) throws IOException {
+		System.out.println("Removing old data");
+		data.clear();
+		System.out.println("Old data removed\nReading in new data");
+		String line = "";
 
-        BufferedReader br = new BufferedReader(new FileReader(file));
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		br.readLine();// ignore first line
+		int i = 0;
+		while ((line = br.readLine()) != null) {
+			while(line.charAt(line.length() - 1) != '"' && br.ready()) {
+				line += br.readLine();
+			}
+			try {
+				data.add(new Entry(line));
+			} catch (Exception e) {
+				i++;
+			}
 
-            while ((line = br.readLine()) != null) {
-                ArrayList<String> parse = new ArrayList<String>();
-                for(String s : line.split(CSV_SPLIT_BY)){
-                	parse.add(s);
-                }
-                data.add(parse);
-                
-            }
+		}
+		br.close();
+		System.out.println("New data loaded, " + i + " errors, "  + data.size() + " entries.");
+	}
 
-        
-        System.out.println("New data loaded");
-    }
-	public final ArrayList<ArrayList<String>> getData() {
+	public final ArrayList<Entry> getData() {
 		return data;
 	}
-	
+
 }

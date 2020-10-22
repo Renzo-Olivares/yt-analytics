@@ -1,12 +1,12 @@
 import java.util.ArrayList;
 import java.lang.NullPointerException;
 public class Query{
-    private ArrayList<ArrayList<String> data;//to be updated with a seperate class soon.
+    private ArrayList<Entry> data;//to be updated with a seperate class soon.
     public Query(){
         data = NULL;
     }
 
-    public void load(ArrayList<ArrayList<String>> data){
+    public void load(ArrayList<Entry> data){
         this.data = data;
     }
 
