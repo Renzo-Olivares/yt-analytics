@@ -6,7 +6,8 @@ class FilterSelection extends StatefulWidget {
 }
 
 class _FilterSelectionState extends State<FilterSelection> {
-  DateTime _currentDate = DateTime.now();
+  DateTime _trendingDate = DateTime.now();
+  DateTime _publishedDate = DateTime.now();
 
   final _tagsController = TextEditingController();
   final _viewsController = TextEditingController();
@@ -17,16 +18,30 @@ class _FilterSelectionState extends State<FilterSelection> {
 
   bool commentsToggle = false;
 
-  Future<void> _showDatePicker(BuildContext context) async {
+  Future<void> _showTrendingDatePicker(BuildContext context) async {
     final selectedDate = await showDatePicker(
       context: context,
-      initialDate: _currentDate,
+      initialDate: _trendingDate,
       firstDate: DateTime(2015, 1),
       lastDate: DateTime(2100),
     );
-    if (selectedDate != null && selectedDate != _currentDate) {
+    if (selectedDate != null && selectedDate != _trendingDate) {
       setState(() {
-        _currentDate = selectedDate;
+        _trendingDate = selectedDate;
+      });
+    }
+  }
+
+  Future<void> _showPublishedDatePicker(BuildContext context) async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _publishedDate,
+      firstDate: DateTime(2015, 1),
+      lastDate: DateTime(2100),
+    );
+    if (selectedDate != null && selectedDate != _publishedDate) {
+      setState(() {
+        _publishedDate = selectedDate;
       });
     }
   }
@@ -90,14 +105,14 @@ class _FilterSelectionState extends State<FilterSelection> {
                     ElevatedButton(
                       child: Text('Trending Date'),
                       onPressed: () {
-                        _showDatePicker(context);
+                        _showTrendingDatePicker(context);
                       },
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
                       child: Text('Publish Date'),
                       onPressed: () {
-                        _showDatePicker(context);
+                        _showPublishedDatePicker(context);
                       },
                     ),
                   ],
