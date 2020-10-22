@@ -37,6 +37,16 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset('assets/icon.png', width: 48),
+            Icon(
+              Icons.analytics_outlined,
+              color: Colors.black,
+            ),
+          ],
+        ),
         elevation: 0,
         title: SearchBar(),
       ),
