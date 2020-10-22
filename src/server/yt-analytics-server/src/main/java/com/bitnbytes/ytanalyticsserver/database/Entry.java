@@ -31,22 +31,33 @@ public class Entry {
 
 	public Entry(String data) throws Exception {
 		ArrayList<String> parse = new ArrayList<String>();
-		for (String s : data.split(",")) {
-			parse.add(s);
+		for (String s : data.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)) {
+			if(s.charAt(0) == ' ') {
+				parse.set(parse.size() - 1, parse.get(parse.size() - 1) + s);
+			}else {
+				parse.add(s);
+			}	
 		}
 		initialize(parse);
 	}
 
 	private void initialize(ArrayList<String> data) throws Exception {
 
-		if (data.size() != 16)
-			throw new Exception("Bad Format");
+		if (data.size() != 16) {
+			String badData = "";
+			for(String s : data) {
+				badData += s + ",";
+			}
+			
+			throw new Exception("Bad Format\tSize: " + data.size() + "\tData:\t" + badData);
+		}
+		
 
 		videoID = data.get(0);
 
 		int[] date = { 0, 0, 0 };
 		for (int i = 0; i < date.length; i++) {
-			date[i] = Integer.parseInt(data.get(1).split(".")[i]);
+			date[i] = Integer.parseInt(data.get(1).split("\\.")[i]);
 		}
 		// date = {YY, DD, MM}
 		date[0] += 2000;
