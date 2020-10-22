@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:yt_analytics_client/components/filter_selection.dart';
+import 'package:yt_analytics_client/components/searchbar.dart';
 import 'package:yt_analytics_client/models/mockmodel.dart';
 import 'package:yt_analytics_client/services/mockservice.dart';
 
@@ -34,10 +36,15 @@ class _HomeState extends State<Home> {
     onDataUpdate updateData = _updateData;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: SearchBar(),
+      ),
       body: Row(
         children: [
           NavigationRail(
             selectedIndex: _selectedIndex,
+            labelType: NavigationRailLabelType.all,
             onDestinationSelected: (int index) {
               setState(() {
                 _selectedIndex = index;
@@ -45,8 +52,8 @@ class _HomeState extends State<Home> {
             },
             destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.star_border),
-                label: Text('Demo'),
+                icon: Icon(Icons.analytics_outlined),
+                label: Text('Stats'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.person_outline),
@@ -54,17 +61,17 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-          VerticalDivider(thickness: 1, width: 1),
           Expanded(
             child: Column(
               children: [
                 SizedBox(height: 20),
-                Expanded(
-                  child: MockPage(
-                    mockModel: futureData,
-                    updater: updateData,
-                  ),
-                ),
+                FilterSelection(),
+                // Expanded(
+                //   child: MockPage(
+                //     mockModel: futureData,
+                //     updater: updateData,
+                //   ),
+                // ),
               ],
             ),
           ),
