@@ -29,6 +29,25 @@ public class Entry {
 		initialize(data);
 	}
 
+	public Entry(Entry e){
+		this.videoID = new String(e.videoID);
+		this.trendingDate = e.trendingDate;
+		this.title = new String(e.title);
+		this.channelTitle = new String(e.channelTitle);
+		this.categoryId = e.categoryId;
+		this.publishTime = e.publishTime;
+		this.tags = new ArrayList<String>(e.tags);
+		this.views = e.views;
+		this.likes = e.likes;
+		this.dislikes = e.dislikes;
+		this.commentCount = e.commentCount;
+		this.thumbnailLink = new String(e.thumbnailLink);
+		this.commentsDisabled = e.commentsDisabled;
+		this.ratingsDisabled = e.ratingsDisabled;
+		this.videoErrorOrRemoved = e.videoErrorOrRemoved;
+		this.description = new String(e.description);
+	}
+
 	public Entry(String data) throws Exception {
 		ArrayList<String> parse = new ArrayList<String>();
 		for (String s : data.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)) {
