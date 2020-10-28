@@ -1,20 +1,20 @@
-import java.text.SimpleDateFormat;
+package com.bitnbytes.ytanalyticsserver.database;
+
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.Arrays;
 
-public class Entry {
+public class Entity {
 	protected String videoID;
-	protected LocalDate trendingDate;
+	protected LocalDate trendingDate;//
 	protected String title;
 	protected String channelTitle;
-	protected int categoryId;
-	protected LocalDateTime publishTime;
-	protected ArrayList<String> tags;
+	protected int categoryId;//
+	protected LocalDateTime publishTime;//
+	protected ArrayList<String> tags;//
 	protected int views;
 	protected int likes;
 	protected int dislikes;
@@ -25,47 +25,43 @@ public class Entry {
 	protected boolean videoErrorOrRemoved;
 	protected String description;
 
-	public Entry(ArrayList<String> data) throws Exception {
-		initialize(data);
-	}
-
-	public Entry(Entry e){
-		this.videoID = new String(e.videoID);
-		this.trendingDate = e.trendingDate;
-		this.title = new String(e.title);
-		this.channelTitle = new String(e.channelTitle);
-		this.categoryId = e.categoryId;
-		this.publishTime = e.publishTime;
-		this.tags = new ArrayList<String>(e.tags);
-		this.views = e.views;
-		this.likes = e.likes;
-		this.dislikes = e.dislikes;
-		this.commentCount = e.commentCount;
-		this.thumbnailLink = new String(e.thumbnailLink);
-		this.commentsDisabled = e.commentsDisabled;
-		this.ratingsDisabled = e.ratingsDisabled;
-		this.videoErrorOrRemoved = e.videoErrorOrRemoved;
-		this.description = new String(e.description);
-	}
-
-	public Entry(String data) throws Exception {
-		ArrayList<String> parse = new ArrayList<String>();
+	public Entity(String data) throws Exception {
+		ArrayList<String> parse = new ArrayList<>();
 		for (String s : data.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)) {
 			if(s.charAt(0) == ' ') {
 				parse.set(parse.size() - 1, parse.get(parse.size() - 1) + s);
 			}else {
 				parse.add(s);
-			}	
+			}
 		}
 		initialize(parse);
+	}
+
+	public Entity(Entity updatedEntry){
+		this.videoID = updatedEntry.videoID;
+		this.trendingDate = updatedEntry.trendingDate;
+		this.title = updatedEntry.title;
+		this.channelTitle = updatedEntry.channelTitle;
+		this.categoryId = updatedEntry.categoryId;
+		this.publishTime = updatedEntry.publishTime;
+		this.tags = new ArrayList<>(updatedEntry.tags);
+		this.views = updatedEntry.views;
+		this.likes = updatedEntry.likes;
+		this.dislikes = updatedEntry.dislikes;
+		this.commentCount = updatedEntry.commentCount;
+		this.thumbnailLink = updatedEntry.thumbnailLink;
+		this.commentsDisabled = updatedEntry.commentsDisabled;
+		this.ratingsDisabled = updatedEntry.ratingsDisabled;
+		this.videoErrorOrRemoved = updatedEntry.videoErrorOrRemoved;
+		this.description = updatedEntry.description;
 	}
 
 	private void initialize(ArrayList<String> data) throws Exception {
 
 		if (data.size() != 16) {
-			String badData = "";
+			StringBuilder badData = new StringBuilder();
 			for(String s : data) {
-				badData += s + ",";
+				badData.append(s).append(",");
 			}
 			
 			throw new Exception("Bad Format\tSize: " + data.size() + "\tData:\t" + badData);
@@ -91,10 +87,8 @@ public class Entry {
 
 		publishTime = LocalDateTime.ofInstant(Instant.parse(data.get(5)), ZoneId.of("UTC"));
 
-		tags = new ArrayList<String>();
-		for (String s : data.get(6).split("|")) {
-			tags.add(s);
-		}
+		tags = new ArrayList<>();
+		tags.addAll(Arrays.asList(data.get(6).split("|")));
 
 		views = Integer.parseInt(data.get(7));
 
@@ -114,6 +108,66 @@ public class Entry {
 
 		description = data.get(15);
 
+	}
+
+	public LocalDate getTrendingDate(){
+		return trendingDate;
+	}
+
+	public LocalDateTime getPublishTime(){
+		return publishTime;
+	}
+
+	public ArrayList<String> getTags(){
+		return tags;
+	}
+
+	public String getVideoID() {
+		return videoID;
+	}
+
+	public String getTitle(){
+		return title;
+	}
+
+	public String getChannelTitle(){
+		return channelTitle;
+	}
+
+	public String getThumbnailLink(){
+		return thumbnailLink;
+	}
+
+	public String getDescription(){
+		return description;
+	}
+
+	public int getViews(){
+		return views;
+	}
+
+	public int getLikes(){
+		return likes;
+	}
+
+	public int getDislikes(){
+		return dislikes;
+	}
+
+	public int getCommentCount(){
+		return commentCount;
+	}
+
+	public boolean getCommentsDisabled(){
+		return commentsDisabled;
+	}
+
+	public boolean getRatingsDisabled(){
+		return ratingsDisabled;
+	}
+
+	public boolean getVideoErrorOrRemoved(){
+		return videoErrorOrRemoved;
 	}
 
 	public String getCategory() {
@@ -145,7 +199,7 @@ public class Entry {
 		case 25:
 			return "News & Politics";
 		case 26:
-			return "Hoto & Style";
+			return "Howto & Style";
 		case 27:
 			return "Education";
 		case 28:
@@ -188,14 +242,13 @@ public class Entry {
 	}
 
 	public String toString() {
-		String print = videoID + ",\t" + trendingDate + ",\t" + title + ",\t" + channelTitle + ",\t" + getCategory()
-				+ ",\t" + publishTime + ",\t";
+		StringBuilder print = new StringBuilder(videoID + ",\t" + trendingDate + ",\t" + title + ",\t" + channelTitle + ",\t" + getCategory()
+				+ ",\t" + publishTime + ",\t");
 		for (String s : tags) {
-			print += s + "|";
+			print.append(s).append("|");
 		}
-		print += ",\t" + views + ",\t" + likes + ",\t" + dislikes + ",\t" + commentCount + ",\t" + thumbnailLink + ",\t"
-				+ commentsDisabled + ",\t" + ratingsDisabled + ",\t" + videoErrorOrRemoved + ",\t" + description + "\n";
+		print.append(",\t").append(views).append(",\t").append(likes).append(",\t").append(dislikes).append(",\t").append(commentCount).append(",\t").append(thumbnailLink).append(",\t").append(commentsDisabled).append(",\t").append(ratingsDisabled).append(",\t").append(videoErrorOrRemoved).append(",\t").append(description).append("\n");
 
-		return print;
+		return print.toString();
 	}
 }

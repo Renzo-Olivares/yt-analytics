@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/rendering.dart';
 import 'package:yt_analytics_client/components/filter_selection.dart';
 import 'package:yt_analytics_client/components/searchbar.dart';
-import 'package:yt_analytics_client/models/mockmodel.dart';
-import 'package:yt_analytics_client/services/mockservice.dart';
+import 'package:yt_analytics_client/models/entity.dart';
+import 'package:yt_analytics_client/services/entityservice.dart';
 
 typedef onDataUpdate = void Function();
 
@@ -17,12 +16,21 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
-  Future<MockModel> futureData;
+  Future<List<Entity>> futureData;
 
   @override
   void initState() {
     super.initState();
-    futureData = fetchServerInfo();
+    futureData = EntityService().getFilteredEntities(
+      // category: ,
+      // commentsDisabled: ,
+      // videoName: ,
+      // views: ,
+      // likes: ,
+      // dislikes: ,
+      channelName: 'PewDiePie',
+    );
+    // futureData = fetchServerInfo();
   }
 
   // void _updateData() {
@@ -76,12 +84,10 @@ class _HomeState extends State<Home> {
               children: [
                 SizedBox(height: 20),
                 FilterSelection(),
-                // Expanded(
-                //   child: MockPage(
-                //     mockModel: futureData,
-                //     updater: updateData,
-                //   ),
-                // ),
+                SizedBox(height: 40),
+                SearchResults(
+                  mockModel: futureData,
+                ),
               ],
             ),
           ),
@@ -91,82 +97,178 @@ class _HomeState extends State<Home> {
   }
 }
 
-class MockPage extends StatefulWidget {
-  MockPage({this.mockModel, this.updater});
+class SearchResults extends StatefulWidget {
+  SearchResults({this.mockModel, this.updater});
 
-  final Future<MockModel> mockModel;
+  final Future<List<Entity>> mockModel;
   final onDataUpdate updater;
 
   @override
-  _MockPageState createState() => _MockPageState();
+  _SearchResultsState createState() => _SearchResultsState();
 }
 
-class _MockPageState extends State<MockPage> {
-  final _addEntryController = TextEditingController();
+class _SearchResultsState extends State<SearchResults> {
+  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+  int _sortColumnIndex;
+  bool _sortAscending = true;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: FutureBuilder(
-            future: this.widget.mockModel,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                  return CircularProgressIndicator();
-                default:
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return ListView.builder(
-                      itemCount: (snapshot.data).mockData.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: Text('${snapshot.data.mockData[index]}'),
-                        );
-                      },
-                    );
-                  }
-              }
-            },
-          ),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              TextField(
-                controller: _addEntryController,
-                decoration: InputDecoration(
-                  filled: true,
-                  labelText: 'Enter a new youtube channel',
+    return FutureBuilder(
+      future: this.widget.mockModel,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return CircularProgressIndicator();
+          default:
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              _TrendingVideoDataSource ytData =
+                  _TrendingVideoDataSource(entities: snapshot.data);
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PaginatedDataTable(
+                  actions: [
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {},
+                    )
+                  ],
+                  header: Text('Trending Videos'),
+                  rowsPerPage: _rowsPerPage,
+                  onRowsPerPageChanged: (value) {
+                    setState(() {
+                      _rowsPerPage = value;
+                    });
+                  },
+                  sortColumnIndex: _sortColumnIndex,
+                  sortAscending: _sortAscending,
+                  onSelectAll: ytData.selectAll,
+                  columns: [
+                    DataColumn(
+                      label: Text('Video ID'),
+                    ),
+                    DataColumn(
+                      label: Text('Trending Date'),
+                    ),
+                    DataColumn(
+                      label: Text('Video Title'),
+                    ),
+                    DataColumn(
+                      label: Text('Channel Name'),
+                    ),
+                    DataColumn(
+                      label: Text('Category'),
+                    ),
+                    DataColumn(
+                      label: Text('Publish Time'),
+                    ),
+                    // DataColumn(
+                    //   label: Text('Tags'),
+                    // ),
+                    DataColumn(
+                      label: Text('Views'),
+                    ),
+                    DataColumn(
+                      label: Text('Likes'),
+                    ),
+                    DataColumn(
+                      label: Text('Dislikes'),
+                    ),
+                    DataColumn(
+                      label: Text('Comment Count'),
+                    ),
+                    DataColumn(
+                      label: Text('Thumbnail Link'),
+                    ),
+                    DataColumn(
+                      label: Text('Comments Disabled'),
+                    ),
+                    DataColumn(
+                      label: Text('Ratings Disabled'),
+                    ),
+                    DataColumn(
+                      label: Text('Video Conflict'),
+                    ),
+                    DataColumn(
+                      label: Text('Description'),
+                    ),
+                  ],
+                  source: ytData,
                 ),
-              ),
-              OutlinedButton(
-                child: Text('Add entry'),
-                onPressed: () {
-                  addData(_addEntryController.text);
-                  widget.updater();
-                },
-                style: OutlinedButton.styleFrom(elevation: 2),
-              ),
-            ],
-          ),
-        ),
+              );
+            }
+        }
+      },
+    );
+  }
+}
+
+class _TrendingVideoDataSource extends DataTableSource {
+  _TrendingVideoDataSource({this.entities});
+  List<Entity> entities;
+  int selectedCount = 0;
+
+  @override
+  DataRow getRow(int index) {
+    final trendingEntry = entities[index];
+
+    assert(index >= 0);
+    if (index >= entities.length) return null;
+
+    return DataRow.byIndex(
+      index: index,
+      selected: trendingEntry.selected,
+      onSelectChanged: (value) {
+        if (trendingEntry.selected != value) {
+          selectedCount += value ? 1 : -1;
+          assert(selectedCount >= 0);
+          trendingEntry.selected = value;
+          notifyListeners();
+        }
+      },
+      cells: [
+        DataCell(Text(trendingEntry.videoID)),
+        DataCell(Text(trendingEntry.trendingDate)),
+        DataCell(Text(trendingEntry.title.replaceAll('\"', ''))),
+        DataCell(Text(trendingEntry.channelTitle.replaceAll('\"', ''))),
+        DataCell(Text(trendingEntry.category)),
+        DataCell(Text(trendingEntry.publishTime)),
+        // DataCell(Text(trendingEntry.tags)),
+        DataCell(Text(trendingEntry.views.toString())),
+        DataCell(Text(trendingEntry.likes.toString())),
+        DataCell(Text(trendingEntry.dislikes.toString())),
+        DataCell(Text(trendingEntry.commentCount.toString())),
+        DataCell(Text(trendingEntry.thumbnailLink)),
+        DataCell(Text(trendingEntry.commentsDisabled.toString())),
+        DataCell(Text(trendingEntry.ratingsDisabled.toString())),
+        DataCell(Text(trendingEntry.videoErrorOrRemoved.toString())),
+        DataCell(Text(trendingEntry.description.replaceAll('\"', ''))),
       ],
     );
   }
 
-  Future<http.Response> addData(String data) {
-    return http.post(
-      "http://localhost:8080/demo/add/",
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'New entry': data,
-      }),
-    );
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => entities.length;
+
+  @override
+  int get selectedRowCount => selectedCount;
+
+  void selectAll(bool checked) {
+    for (final trendingEntry in entities) {
+      trendingEntry.selected = checked;
+    }
+    selectedCount = checked ? entities.length : 0;
+    notifyListeners();
   }
 }

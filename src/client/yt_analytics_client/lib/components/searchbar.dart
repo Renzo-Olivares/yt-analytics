@@ -30,6 +30,11 @@ class _SearchBarState extends State<SearchBar> {
           icon: Icon(Icons.search),
           color: Colors.grey,
         ),
+        IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.add),
+          color: Colors.grey,
+        ),
       ],
     );
   }
