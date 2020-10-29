@@ -49,4 +49,21 @@ class EntityManager with ChangeNotifier {
     _entities = api.getAllEntities();
     notifyListeners();
   }
+
+  void deleteSelected() {
+    _entities.then((entities) {
+      for (final entity in entities) {
+        if (entity.selected) {
+          entities.remove(entity);
+        }
+      }
+    });
+
+    notifyListeners();
+  }
+
+  void addEntity(Entity entity) {
+    _entities.then((entities) => entities.add(entity));
+    notifyListeners();
+  }
 }

@@ -43,15 +43,10 @@ class _SearchBarState extends State<SearchBar> {
                   model.channelName,
                 );
               },
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search_outlined),
               color: Colors.grey,
             );
           },
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.add),
-          color: Colors.grey,
         ),
       ],
     );

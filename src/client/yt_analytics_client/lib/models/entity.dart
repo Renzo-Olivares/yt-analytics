@@ -16,7 +16,7 @@ class Entity {
     this.description,
     this.videoID,
     this.trendingDate,
-    this.selected,
+    this.selected = false,
   });
 
   Entity.fromJson(Map<String, dynamic> data)

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yt_analytics_client/constants.dart' as Constants;
 import 'package:yt_analytics_client/models/filtermanager.dart';
 
 enum FilterType {
   channelName,
-  category,
   commentsDisabled,
   videoName,
   views,
   likes,
   comments,
   tags,
-  dislikes
+  dislikes,
 }
 
 class FilterSelection extends StatefulWidget {
@@ -23,41 +23,6 @@ class _FilterSelectionState extends State<FilterSelection> {
   DateTime _trendingDate = DateTime.now();
   DateTime _publishedDate = DateTime.now();
   String _dropdownValue;
-  final List<String> _categories = [
-    'None',
-    'Film & Animation',
-    'Autos & Vehicles',
-    'Music',
-    'Pets & Animals',
-    'Sports',
-    'Short Movies',
-    'Travel & Events',
-    'Gaming',
-    'Videoblogging',
-    'People & Blogs',
-    'Comedy',
-    'Entertainment',
-    'News & Politics',
-    'Howto & Style',
-    'Education',
-    'Science & Technology',
-    'Nonprofits & Activism',
-    'Movies',
-    'Anime/Animation',
-    'Action/Adventure',
-    'Classics',
-    'Comedy',
-    'Documentary',
-    'Drama',
-    'Family',
-    'Foreign',
-    'Horror',
-    'Sci-Fi/Fantasy',
-    'Thriller',
-    'Shorts',
-    'Shows',
-    'Trailers',
-  ];
 
   // final _tagsController = TextEditingController();
   final _viewsController = TextEditingController();
@@ -107,7 +72,7 @@ class _FilterSelectionState extends State<FilterSelection> {
             .bodyText1
             .copyWith(fontWeight: FontWeight.bold),
       ),
-      trailing: SizedBox(),
+      trailing: const SizedBox(),
       children: [
         Padding(
           padding: const EdgeInsetsDirectional.only(
@@ -124,25 +89,25 @@ class _FilterSelectionState extends State<FilterSelection> {
                 title: 'STATS',
                 filters: Column(
                   children: [
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     _FilterInput(
                       controller: _viewsController,
                       hint: 'More than x views',
                       type: FilterType.views,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     _FilterInput(
                       controller: _likesController,
                       hint: 'More than x likes',
                       type: FilterType.likes,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     _FilterInput(
                       controller: _dislikesController,
                       hint: 'More than x dislikes',
                       type: FilterType.dislikes,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     // _FilterInput(
                     //   controller: _commentsController,
                     //   hint: 'More than x comments',
@@ -155,14 +120,14 @@ class _FilterSelectionState extends State<FilterSelection> {
                 title: 'DATES',
                 filters: Column(
                   children: [
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     ElevatedButton(
                       child: Text('Trending Date'),
                       onPressed: () {
                         _showTrendingDatePicker(context);
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       child: Text('Publish Date'),
                       onPressed: () {
@@ -189,7 +154,7 @@ class _FilterSelectionState extends State<FilterSelection> {
                 title: 'VIDEO PROPERTIES',
                 filters: Column(
                   children: [
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     Row(children: [
                       Switch(
                         value: commentsToggle,
@@ -205,13 +170,13 @@ class _FilterSelectionState extends State<FilterSelection> {
                         'Comments ${commentsToggle ? 'Enabled' : 'Disabled'}',
                       )
                     ]),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     _FilterInput(
                       controller: _channelController,
                       hint: 'Channel Name',
                       type: FilterType.channelName,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     DropdownButton<String>(
                       hint: Text('Category'),
                       value: _dropdownValue,
@@ -222,7 +187,8 @@ class _FilterSelectionState extends State<FilterSelection> {
                               .category = value;
                         });
                       },
-                      items: _categories.map<DropdownMenuItem<String>>((value) {
+                      items: Constants.categories
+                          .map<DropdownMenuItem<String>>((value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -268,10 +234,6 @@ class _FilterInput extends StatelessWidget {
           switch (type) {
             case FilterType.channelName:
               Provider.of<FilterManager>(context, listen: false).channelName =
-                  value;
-              break;
-            case FilterType.category:
-              Provider.of<FilterManager>(context, listen: false).category =
                   value;
               break;
             case FilterType.comments:
