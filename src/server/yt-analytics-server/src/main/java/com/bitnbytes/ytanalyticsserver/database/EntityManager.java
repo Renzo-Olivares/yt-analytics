@@ -26,6 +26,10 @@ public class EntityManager {
     }
 
     public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+        //default value for commentsDisabled is "null"
+        //default value for category is "None" or ""
+        //default value for all others is ""
+        filteredList.clear();
         filteredList.add(entities.get(0));
         return filteredList;
     }

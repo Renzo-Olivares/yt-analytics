@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 import 'package:yt_analytics_client/components/filter_selection.dart';
 import 'package:yt_analytics_client/components/searchbar.dart';
 import 'package:yt_analytics_client/models/entity.dart';
-import 'package:yt_analytics_client/services/entityservice.dart';
-
-typedef onDataUpdate = void Function();
+import 'package:yt_analytics_client/models/entitymanager.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -16,33 +15,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
-  Future<List<Entity>> futureData;
 
   @override
   void initState() {
     super.initState();
-    futureData = EntityService().getFilteredEntities(
-      // category: ,
-      // commentsDisabled: ,
-      // videoName: ,
-      // views: ,
-      // likes: ,
-      // dislikes: ,
-      channelName: 'PewDiePie',
-    );
-    // futureData = fetchServerInfo();
   }
-
-  // void _updateData() {
-  //   setState(() {
-  //     futureData = fetchServerInfo();
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
-    // onDataUpdate updateData = _updateData;
-
     return Scaffold(
       appBar: AppBar(
         leading: Stack(
@@ -85,8 +65,12 @@ class _HomeState extends State<Home> {
                 SizedBox(height: 20),
                 FilterSelection(),
                 SizedBox(height: 40),
-                SearchResults(
-                  mockModel: futureData,
+                Consumer<EntityManager>(
+                  builder: (context, model, child) {
+                    return SearchResults(
+                      mockModel: model.entities,
+                    );
+                  },
                 ),
               ],
             ),
@@ -98,10 +82,9 @@ class _HomeState extends State<Home> {
 }
 
 class SearchResults extends StatefulWidget {
-  SearchResults({this.mockModel, this.updater});
+  SearchResults({this.mockModel});
 
   final Future<List<Entity>> mockModel;
-  final onDataUpdate updater;
 
   @override
   _SearchResultsState createState() => _SearchResultsState();

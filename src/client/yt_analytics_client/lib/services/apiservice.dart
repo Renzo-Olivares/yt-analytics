@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:yt_analytics_client/models/entity.dart';
 
-class EntityService {
+class ApiService {
   final String apiUrl = 'user:pass@localhost:8080';
 
   Future<List<Entity>> getAllEntities() async {

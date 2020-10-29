@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yt_analytics_client/models/entitymanager.dart';
+import 'package:yt_analytics_client/models/filtermanager.dart';
 
 class SearchBar extends StatefulWidget {
   @override
@@ -25,10 +28,25 @@ class _SearchBarState extends State<SearchBar> {
             ),
           ),
         ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.search),
-          color: Colors.grey,
+        Consumer<FilterManager>(
+          builder: (context, model, child) {
+            return IconButton(
+              onPressed: () {
+                Provider.of<EntityManager>(context, listen: false)
+                    .loadFilteredEntities(
+                  model.category,
+                  model.commentsDisabled.toString(),
+                  _searchBarController.text,
+                  model.views,
+                  model.likes,
+                  model.dislikes,
+                  model.channelName,
+                );
+              },
+              icon: Icon(Icons.search),
+              color: Colors.grey,
+            );
+          },
         ),
         IconButton(
           onPressed: () {},
