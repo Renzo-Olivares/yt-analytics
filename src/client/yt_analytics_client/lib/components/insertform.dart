@@ -187,12 +187,14 @@ class _InsertFormState extends State<InsertForm> {
             children: [
               OutlinedButton(
                 onPressed: () {
+                  print(_publishedDate.toIso8601String().split('.')[0]);
                   Provider.of<EntityManager>(context, listen: false).addEntity(
                     Entity(
                       title: _videoNameController.text,
                       channelTitle: _channelController.text,
                       category: _selectedCategory,
-                      publishTime: _publishedDate.toIso8601String(),
+                      publishTime:
+                          _publishedDate.toIso8601String().split('.')[0],
                       tags: [],
                       views: int.parse(_viewsController.text),
                       likes: int.parse(_likesController.text),

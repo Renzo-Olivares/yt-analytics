@@ -1,5 +1,6 @@
 package com.bitnbytes.ytanalyticsserver.database;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -9,12 +10,12 @@ import java.util.Arrays;
 
 public class Entity {
 	protected String videoID;
-	protected LocalDate trendingDate;//
+	protected LocalDate trendingDate;
 	protected String title;
 	protected String channelTitle;
-	protected int categoryId;//
-	protected LocalDateTime publishTime;//
-	protected ArrayList<String> tags;//
+	protected int categoryId;
+	protected LocalDateTime publishTime;
+	protected ArrayList<String> tags;
 	protected int views;
 	protected int likes;
 	protected int dislikes;
@@ -37,6 +38,25 @@ public class Entity {
 		initialize(parse);
 	}
 
+	public Entity(String videoID, LocalDate trendingDate, String title, String channelTitle, String category, LocalDateTime publishTime, ArrayList<String> tags, int views, int likes, int dislikes, int comments, String thumbnailLink, boolean commentsDisabled, boolean ratingsDisabled, boolean videoErrorOrRemoved, String description){
+		this.videoID = videoID;
+		this.trendingDate = trendingDate;
+		this.title = title;
+		this.channelTitle = channelTitle;
+		this.categoryId = getCategoryId(category);
+		this.publishTime = publishTime;
+		this.tags = tags;
+		this.views = views;
+		this.likes = likes;
+		this.dislikes = dislikes;
+		this.commentCount = comments;
+		this.thumbnailLink = thumbnailLink;
+		this.commentsDisabled = commentsDisabled;
+		this.ratingsDisabled = ratingsDisabled;
+		this.videoErrorOrRemoved = videoErrorOrRemoved;
+		this.description = description;
+	}
+
 	public Entity(Entity updatedEntry){
 		this.videoID = updatedEntry.videoID;
 		this.trendingDate = updatedEntry.trendingDate;
@@ -55,6 +75,55 @@ public class Entity {
 		this.videoErrorOrRemoved = updatedEntry.videoErrorOrRemoved;
 		this.description = updatedEntry.description;
 	}
+
+	public String getDataCSV() {
+		String s = "" + videoID + ",";
+		s += trendingDate.format(DateTimeFormatter.ofPattern("yy.dd.MM")) + ",";
+		s += "" + title + ",";
+		s += "" + channelTitle + ",";
+		s += categoryId + ",";
+
+		s += publishTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ".000Z,";
+
+		int tagsSize = tags.size();
+		if (tagsSize == 0) {
+			s += "[none]";
+		} else if (tagsSize == 1) {
+			s += tags.get(0);
+		} else {
+			s += tags.get(0);
+			for (int i = 1; i < tagsSize; i++) {
+				s += "|" + tags.get(i);
+			}
+		}
+		s += "," + views + "," + likes + "," + dislikes + "," + commentCount + ",";
+		s += "" + thumbnailLink + ",";
+		s += commentsDisabled + "," + ratingsDisabled + "," + videoErrorOrRemoved + "," + description + "";
+
+		return s;
+	}
+
+	public boolean equals(Entity e) {
+		if(!this.videoID.equals(e.videoID))return false;
+		if(!this.trendingDate.equals(e.trendingDate))return false;
+		if(!this.title.equals(e.title))return false;
+		if(!this.channelTitle.equals(e.channelTitle))return false;
+		if(this.categoryId != e.categoryId)return false;
+		if(!this.publishTime.equals(e.publishTime))return false;
+		if(!this.tags.equals(e.tags))return false;
+		if(this.views != e.views)return false;
+		if(this.likes != e.likes)return false;
+		if(this.dislikes != e.dislikes)return false;
+		if(this.commentCount != e.commentCount)return false;
+		if(!this.thumbnailLink.equals(e.thumbnailLink))return false;
+		if(this.commentsDisabled != e.commentsDisabled)return false;
+		if(this.ratingsDisabled != e.ratingsDisabled)return false;
+		if(this.videoErrorOrRemoved != e.videoErrorOrRemoved)return false;
+		if(!this.description.equals(e.description))return false;
+
+		return true;
+	}
+
 
 	private void initialize(ArrayList<String> data) throws Exception {
 
@@ -88,7 +157,7 @@ public class Entity {
 		publishTime = LocalDateTime.ofInstant(Instant.parse(data.get(5)), ZoneId.of("UTC"));
 
 		tags = new ArrayList<>();
-		tags.addAll(Arrays.asList(data.get(6).split("|")));
+		tags.addAll(Arrays.asList(data.get(6).split("\\|")));
 
 		views = Integer.parseInt(data.get(7));
 
@@ -215,7 +284,7 @@ public class Entity {
 		case 33:
 			return "Classics";
 		case 34:
-			return "Comedy";
+			return "Comedy";//why is there two comedys?
 		case 35:
 			return "Documentary";
 		case 36:
@@ -238,6 +307,75 @@ public class Entity {
 			return "Trailers";
 		default:
 			return "ERROR";
+		}
+	}
+
+	public int getCategoryId(String category) {
+		switch (category) {
+			case "Film & Animation":
+				return 1;
+			case "Autos & Vehicles":
+				return 2;
+			case "Music":
+				return 10;
+			case "Pets & Animals":
+				return 15;
+			case "Sports":
+				return 17;
+			case "Short Movies":
+				return 18;
+			case "Travel & Events":
+				return 19;
+			case "Gaming":
+				return 20;
+			case "Videoblogging":
+				return 21;
+			case "People & Blogs":
+				return 22;
+			case "Comedy":
+				return 23;
+			case "Entertainment":
+				return 24;
+			case "News & Politics":
+				return 25;
+			case "Howto & Style":
+				return 26;
+			case "Education":
+				return 27;
+			case "Science & Technology":
+				return 28;
+			case "Nonprofits & Activism":
+				return 29;
+			case "Movies":
+				return 30;
+			case "Anime/Animation":
+				return 31;
+			case "Action/Adventure":
+				return 32;
+			case "Classics":
+				return 33;
+			case "Documentary":
+				return 35;
+			case "Drama":
+				return 36;
+			case "Family":
+				return 37;
+			case "Foreign":
+				return 38;
+			case "Horror":
+				return 39;
+			case "Sci-Fi/Fantasy":
+				return 40;
+			case "Thriller":
+				return 41;
+			case "Shorts":
+				return 42;
+			case "Shows":
+				return 43;
+			case "Trailers":
+				return 44;
+			default:
+				return 0;
 		}
 	}
 

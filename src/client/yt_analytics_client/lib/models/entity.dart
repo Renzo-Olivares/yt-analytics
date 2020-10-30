@@ -45,9 +45,9 @@ class Entity {
   final String category;
   final String publishTime;
   final List<dynamic> tags;
-  final int views;
-  final int likes;
-  final int dislikes;
+  int views;
+  int likes;
+  int dislikes;
   final int commentCount;
   final String thumbnailLink;
   final bool commentsDisabled;
@@ -55,4 +55,16 @@ class Entity {
   final bool videoErrorOrRemoved;
   final String description;
   bool selected;
+
+  // set numviews(int views) {
+  //   this.views = views;
+  // }
+  //
+  // set numdislikes(int dislikes) {
+  //   this.dislikes = dislikes;
+  // }
+  //
+  // set numlikes(int likes) {
+  //   this.likes = likes;
+  // }
 }

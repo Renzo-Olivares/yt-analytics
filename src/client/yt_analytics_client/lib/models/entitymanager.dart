@@ -9,6 +9,14 @@ class EntityManager with ChangeNotifier {
 
   Future<List<Entity>> get entities => _entities;
 
+  Future<Entity> get currentSelected => _entities.then((entities) {
+        for (final entity in entities) {
+          if (entity.selected) {
+            return entity;
+          }
+        }
+      });
+
   final ApiService api = ApiService();
 
   void loadFilteredEntities(
@@ -55,6 +63,7 @@ class EntityManager with ChangeNotifier {
       for (final entity in entities) {
         if (entity.selected) {
           entities.remove(entity);
+          api.deleteEntity(entity.videoID);
         }
       }
     });
@@ -64,6 +73,36 @@ class EntityManager with ChangeNotifier {
 
   void addEntity(Entity entity) {
     _entities.then((entities) => entities.add(entity));
+    api.addNewEntity(entity);
+    notifyListeners();
+  }
+
+  void updateEntity(String views, String likes, String dislikes) {
+    _entities.then((entities) {
+      for (var entity in entities) {
+        if (entity.selected) {
+          final oldViews = entity.views.toString();
+          entity.likes = int.parse(likes);
+          entity.dislikes = int.parse(dislikes);
+          entity.views = int.parse(views);
+          print(entities.length);
+          entities[entities.indexOf(entity)] = entity;
+          print(entities.length);
+          print(entity.videoID);
+          api.updateEntity(entity.videoID, oldViews, views, likes, dislikes);
+          return;
+        }
+      }
+    });
+    notifyListeners();
+  }
+
+  void backupData(String filePath) {
+    api.backup(filePath);
+  }
+
+  void restoreData(String filePath) {
+    api.restore(filePath);
     notifyListeners();
   }
 }

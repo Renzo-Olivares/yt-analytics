@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yt_analytics_client/components/backuprestoredialog.dart';
+import 'package:yt_analytics_client/components/editform.dart';
 import 'package:yt_analytics_client/components/insertform.dart';
 import 'package:yt_analytics_client/models/entity.dart';
 import 'package:yt_analytics_client/models/entitymanager.dart';
@@ -42,16 +44,23 @@ class _SearchResultsState extends State<SearchResults> {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) {
-                            return InsertForm();
-                          },
+                          builder: (context) => InsertForm(),
                         );
                       },
                       tooltip: 'Insert',
                       icon: Icon(Icons.add_outlined),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => EditForm(
+                            entity: Provider.of<EntityManager>(context,
+                                    listen: false)
+                                .currentSelected,
+                          ),
+                        );
+                      },
                       tooltip: 'Edit',
                       icon: Icon(Icons.edit_outlined),
                     ),
@@ -64,12 +73,26 @@ class _SearchResultsState extends State<SearchResults> {
                       },
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          child: BackupRestoreDialog(
+                            type: DialogType.BACKUP,
+                          ),
+                        );
+                      },
                       tooltip: 'Backup',
                       icon: Icon(Icons.backup_outlined),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          child: BackupRestoreDialog(
+                            type: DialogType.RESTORE,
+                          ),
+                        );
+                      },
                       tooltip: 'Restore',
                       icon: Icon(Icons.restore_outlined),
                     ),
