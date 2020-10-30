@@ -187,7 +187,7 @@ class _FilterSelectionState extends State<FilterSelection> {
                               .category = value;
                         });
                       },
-                      items: Constants.categories
+                      items: Constants.categoriesDrop
                           .map<DropdownMenuItem<String>>((value) {
                         return DropdownMenuItem<String>(
                           value: value,
