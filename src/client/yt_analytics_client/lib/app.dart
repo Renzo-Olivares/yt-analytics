@@ -28,7 +28,7 @@ ThemeData _buildLightTheme(BuildContext context) {
   final base = ThemeData.light();
   return base.copyWith(
     primaryColor: Colors.white,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: ClientColors.red500,
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity,

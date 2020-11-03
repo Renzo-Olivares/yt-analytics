@@ -3,8 +3,9 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:yt_analytics_client/components/filterselection.dart';
 import 'package:yt_analytics_client/components/searchbar.dart';
+import 'package:yt_analytics_client/components/searchresults.dart';
+import 'package:yt_analytics_client/models/entity.dart';
 import 'package:yt_analytics_client/models/entitymanager.dart';
-import 'package:yt_analytics_client/searchresults.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -15,11 +16,6 @@ class _HomeState extends State<Home> {
   int _selectedIndex = 0;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -27,7 +23,7 @@ class _HomeState extends State<Home> {
           alignment: Alignment.center,
           children: [
             Image.asset('assets/icon.png', width: 48),
-            Icon(
+            const Icon(
               Icons.analytics_outlined,
               color: Colors.black,
             ),
@@ -41,12 +37,16 @@ class _HomeState extends State<Home> {
           NavigationRail(
             selectedIndex: _selectedIndex,
             labelType: NavigationRailLabelType.all,
-            onDestinationSelected: (int index) {
+            onDestinationSelected: (index) {
               setState(() {
                 _selectedIndex = index;
               });
             },
-            destinations: [
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.table_chart_outlined),
+                label: Text('Viewer'),
+              ),
               NavigationRailDestination(
                 icon: Icon(Icons.analytics_outlined),
                 label: Text('Stats'),
@@ -60,15 +60,18 @@ class _HomeState extends State<Home> {
           Expanded(
             child: Column(
               children: [
-                SizedBox(height: 20),
-                FilterSelection(),
-                SizedBox(height: 40),
-                Consumer<EntityManager>(
-                  builder: (context, model, child) {
-                    return SearchResults(
-                      mockModel: model.entities,
-                    );
-                  },
+                const SizedBox(height: 20),
+                const FilterSelection(),
+                const SizedBox(height: 40),
+                Flexible(
+                  child: Consumer<EntityManager>(
+                    builder: (context, model, child) {
+                      return SearchResults(
+                        results:
+                            model.entities ?? Future<List<Entity>>(() => null),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

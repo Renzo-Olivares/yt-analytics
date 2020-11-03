@@ -7,9 +7,9 @@ import 'package:yt_analytics_client/models/entity.dart';
 import 'package:yt_analytics_client/models/entitymanager.dart';
 
 class SearchResults extends StatefulWidget {
-  SearchResults({this.mockModel});
+  SearchResults({@required this.results}) : assert(results != null);
 
-  final Future<List<Entity>> mockModel;
+  final Future<List<Entity>> results;
 
   @override
   _SearchResultsState createState() => _SearchResultsState();
@@ -18,54 +18,69 @@ class SearchResults extends StatefulWidget {
 class _SearchResultsState extends State<SearchResults> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   int _sortColumnIndex;
-  bool _sortAscending = true;
+  final bool _sortAscending = true;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: this.widget.mockModel,
+      future: widget.results,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           default:
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              _TrendingVideoDataSource ytData =
-                  _TrendingVideoDataSource(entities: snapshot.data);
+              final ytData = _TrendingVideoDataSource(
+                context: context,
+                entities: snapshot.data as List<Entity> ?? <Entity>[],
+              );
 
-              return Padding(
+              return SingleChildScrollView(
                 padding: const EdgeInsets.all(8.0),
                 child: PaginatedDataTable(
                   actions: [
                     IconButton(
                       onPressed: () {
-                        showDialog(
+                        showDialog<void>(
                           context: context,
                           builder: (context) => InsertForm(),
                         );
                       },
                       tooltip: 'Insert',
-                      icon: Icon(Icons.add_outlined),
+                      icon: const Icon(Icons.add_outlined),
                     ),
                     IconButton(
                       onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => EditForm(
-                            entity: Provider.of<EntityManager>(context,
-                                    listen: false)
-                                .currentSelected,
-                          ),
-                        );
+                        if (Provider.of<EntityManager>(context, listen: false)
+                                .selectedCount ==
+                            1) {
+                          showDialog<void>(
+                            context: context,
+                            builder: (context) => EditForm(
+                              entity: Provider.of<EntityManager>(
+                                context,
+                                listen: false,
+                              ).currentSelected,
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Please select only one entry to edit',
+                              ),
+                            ),
+                          );
+                        }
                       },
                       tooltip: 'Edit',
-                      icon: Icon(Icons.edit_outlined),
+                      icon: const Icon(Icons.edit_outlined),
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete_outline),
+                      icon: const Icon(Icons.delete_outline),
                       tooltip: 'Delete',
                       onPressed: () {
                         Provider.of<EntityManager>(context, listen: false)
@@ -74,27 +89,31 @@ class _SearchResultsState extends State<SearchResults> {
                     ),
                     IconButton(
                       onPressed: () {
-                        showDialog(
+                        showDialog<void>(
                           context: context,
-                          child: BackupRestoreDialog(
-                            type: DialogType.BACKUP,
-                          ),
+                          builder: (context) {
+                            return BackupRestoreDialog(
+                              type: DialogType.backup,
+                            );
+                          },
                         );
                       },
                       tooltip: 'Backup',
-                      icon: Icon(Icons.backup_outlined),
+                      icon: const Icon(Icons.backup_outlined),
                     ),
                     IconButton(
                       onPressed: () {
-                        showDialog(
+                        showDialog<void>(
                           context: context,
-                          child: BackupRestoreDialog(
-                            type: DialogType.RESTORE,
-                          ),
+                          builder: (context) {
+                            return BackupRestoreDialog(
+                              type: DialogType.restore,
+                            );
+                          },
                         );
                       },
                       tooltip: 'Restore',
-                      icon: Icon(Icons.restore_outlined),
+                      icon: const Icon(Icons.restore_outlined),
                     ),
                   ],
                   header: const Text('Trending Videos'),
@@ -126,9 +145,9 @@ class _SearchResultsState extends State<SearchResults> {
                     DataColumn(
                       label: Text('Publish Time'),
                     ),
-                    // DataColumn(
-                    //   label: Text('Tags'),
-                    // ),
+                    DataColumn(
+                      label: Text('Tags'),
+                    ),
                     DataColumn(
                       label: Text('Views'),
                     ),
@@ -168,8 +187,11 @@ class _SearchResultsState extends State<SearchResults> {
 }
 
 class _TrendingVideoDataSource extends DataTableSource {
-  _TrendingVideoDataSource({this.entities});
+  _TrendingVideoDataSource({@required this.entities, @required this.context})
+      : assert(entities != null),
+        assert(context != null);
   List<Entity> entities;
+  BuildContext context;
   int selectedCount = 0;
 
   @override
@@ -187,6 +209,8 @@ class _TrendingVideoDataSource extends DataTableSource {
           selectedCount += value ? 1 : -1;
           assert(selectedCount >= 0);
           trendingEntry.selected = value;
+          Provider.of<EntityManager>(context, listen: false).selectedCount =
+              selectedCount;
           notifyListeners();
         }
       },
@@ -197,7 +221,7 @@ class _TrendingVideoDataSource extends DataTableSource {
         DataCell(Text(trendingEntry.channelTitle.replaceAll('\"', ''))),
         DataCell(Text(trendingEntry.category)),
         DataCell(Text(trendingEntry.publishTime)),
-        // DataCell(Text(trendingEntry.tags)),
+        DataCell(Text(parseTags(trendingEntry.tags))),
         DataCell(Text(trendingEntry.views.toString())),
         DataCell(Text(trendingEntry.likes.toString())),
         DataCell(Text(trendingEntry.dislikes.toString())),
@@ -226,5 +250,15 @@ class _TrendingVideoDataSource extends DataTableSource {
     }
     selectedCount = checked ? entities.length : 0;
     notifyListeners();
+  }
+
+  String parseTags(String tags) {
+    var parsedStrings = tags.split(',');
+
+    for (var i = 0; i < parsedStrings.length; i++) {
+      parsedStrings[i] = parsedStrings[i].replaceAll('\"', '');
+    }
+
+    return parsedStrings.join(' , ');
   }
 }

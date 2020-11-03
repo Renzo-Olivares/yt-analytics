@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yt_analytics_client/components/filterselection.dart';
 import 'package:yt_analytics_client/models/entitymanager.dart';
 import 'package:yt_analytics_client/models/filtermanager.dart';
 
@@ -17,14 +18,14 @@ class _SearchBarState extends State<SearchBar> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 500),
+          constraints: const BoxConstraints(maxWidth: 500),
           child: TextField(
             controller: _searchBarController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               filled: true,
               labelStyle: TextStyle(color: Colors.grey),
               border: OutlineInputBorder(),
-              labelText: 'Search analytics',
+              labelText: 'Search by video name',
             ),
           ),
         ),
@@ -32,16 +33,27 @@ class _SearchBarState extends State<SearchBar> {
           builder: (context, model, child) {
             return IconButton(
               onPressed: () {
-                Provider.of<EntityManager>(context, listen: false)
-                    .loadFilteredEntities(
-                  model.category,
-                  model.commentsDisabled.toString(),
-                  _searchBarController.text,
-                  model.views,
-                  model.likes,
-                  model.dislikes,
-                  model.channelName,
-                );
+                if (filterFormKey.currentState == null ||
+                    filterFormKey.currentState.validate()) {
+                  Provider.of<EntityManager>(context, listen: false)
+                      .loadFilteredEntities(
+                    model.category,
+                    (!model.commentsDisabled).toString(),
+                    _searchBarController.text,
+                    model.views,
+                    model.likes,
+                    model.dislikes,
+                    model.channelName,
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please check all fields and try again',
+                      ),
+                    ),
+                  );
+                }
               },
               icon: const Icon(Icons.search_outlined),
               color: Colors.grey,

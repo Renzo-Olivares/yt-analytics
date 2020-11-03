@@ -9,13 +9,26 @@ class EntityManager with ChangeNotifier {
 
   Future<List<Entity>> get entities => _entities;
 
-  Future<Entity> get currentSelected => _entities.then((entities) {
-        for (final entity in entities) {
-          if (entity.selected) {
-            return entity;
+  int _selectedCount = 0;
+
+  // ignore: unnecessary_getters_setters
+  set selectedCount(int value) {
+    _selectedCount = value;
+  }
+
+  // ignore: unnecessary_getters_setters
+  int get selectedCount => _selectedCount;
+
+  Future<Entity> get currentSelected => _entities.then(
+        (entities) {
+          for (final entity in entities) {
+            if (entity.selected) {
+              return entity;
+            }
           }
-        }
-      });
+          return null;
+        },
+      );
 
   final ApiService api = ApiService();
 
@@ -63,7 +76,7 @@ class EntityManager with ChangeNotifier {
       for (final entity in entities) {
         if (entity.selected) {
           entities.remove(entity);
-          api.deleteEntity(entity.videoID);
+          api.deleteEntity(entity.videoID, entity.views.toString());
         }
       }
     });
@@ -72,8 +85,8 @@ class EntityManager with ChangeNotifier {
   }
 
   void addEntity(Entity entity) {
-    _entities.then((entities) => entities.add(entity));
     api.addNewEntity(entity);
+    _entities.then((entities) => entities.add(entity));
     notifyListeners();
   }
 

@@ -11,6 +11,6 @@ public interface EntityService {
     void backup(String filePath);
     void restore(String filePath) throws IOException;
     void insertData(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description);
-    void removeEntity(String videoID);
+    void removeEntity(String videoID, String views);
     void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes);
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class FilterManager with ChangeNotifier {
   String _category = '';
-  bool _commentsDisabled;
+  bool _commentsDisabled = false;
   String _videoName = '';
   String _views = '';
   String _comments = '';

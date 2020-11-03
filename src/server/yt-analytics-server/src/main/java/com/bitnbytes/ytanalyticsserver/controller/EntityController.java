@@ -49,10 +49,10 @@ public class EntityController {
         return new ResponseEntity<>("Backup initiated", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/remove/{videoID}", method = RequestMethod.POST)
-    public ResponseEntity<String> removeEntity(@PathVariable String videoID){
+    @RequestMapping(value = "/remove/videoID/{videoID}/views/{views}", method = RequestMethod.POST)
+    public ResponseEntity<String> removeEntity(@PathVariable String videoID, @PathVariable String views){
         System.out.println("Deleting entity");
-        entityService.removeEntity(videoID);
+        entityService.removeEntity(videoID, views);
         return new ResponseEntity<>("Entity deleted", HttpStatus.OK);
     }
 

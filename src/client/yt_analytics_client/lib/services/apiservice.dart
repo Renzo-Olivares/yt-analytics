@@ -8,28 +8,26 @@ class ApiService {
   final String apiUrl = 'user:pass@localhost:8080';
 
   Future<List<Entity>> getAllEntities() async {
-    print('fetching server info');
+    print('fetching all data');
     final uri = Uri.http(apiUrl, 'ytanalytics/entities');
 
     final response = await http.get(uri);
 
-    print('server info fetched');
-    final List<Entity> entities = [];
+    print('all data fetched');
+    final entities = <Entity>[];
 
     if (response.statusCode == 200) {
-      print('response good');
-      List<dynamic> responseJson = jsonDecode(response.body);
-
-      print('Mock data received from server: ${responseJson[0]}');
+      print('response for all data fetch is okay');
+      final responseJson = jsonDecode(response.body) as List<dynamic>;
 
       for (var response in responseJson) {
-        entities.add(Entity.fromJson(response));
+        entities.add(Entity.fromJson(response as Map<String, dynamic>));
       }
 
       return entities;
     } else {
-      print('response not good');
-      throw Exception('Failed to load server data');
+      print('response for all data fetch not okay');
+      throw Exception('Failed to load all server data');
     }
   }
 
@@ -42,7 +40,7 @@ class ApiService {
     String dislikes = '',
     String channelName = '',
   }) async {
-    print('fetching server info');
+    print('fetching filtered data');
 
     final uri = Uri.http(
       apiUrl,
@@ -58,37 +56,37 @@ class ApiService {
 
     final response = await http.get(uri);
 
-    print('server info fetched');
-    final List<Entity> entities = [];
+    print('filtered data fetched');
+    final entities = <Entity>[];
 
     if (response.statusCode == 200) {
-      print('response good');
-      List<dynamic> responseJson = jsonDecode(response.body);
-
-      print('Mock data received from server: ${responseJson[0]}');
+      print('response for filtered data request is okay');
+      final responseJson = jsonDecode(response.body) as List<dynamic>;
 
       for (var response in responseJson) {
-        entities.add(Entity.fromJson(response));
+        entities.add(Entity.fromJson(response as Map<String, dynamic>));
       }
 
       return entities;
     } else {
-      print('response not good');
-      throw Exception('Failed to load server data');
+      print('response for filtered data request not okay');
+      throw Exception('Failed to load filtered server data');
     }
   }
 
   Future<void> addNewEntity(Entity entity) async {
+    print('adding new entity');
+
     final uri = Uri.http(
       apiUrl,
       'ytanalytics/insert/'
       'videoID/{${entity.videoID}}/'
       'trendingDate/{${entity.trendingDate}}/'
-      'title/{${entity.title}}/'
-      'channelTitle/{${entity.channelTitle}}/'
+      'title/{"${entity.title}"}/'
+      'channelTitle/{"${entity.channelTitle}"}/'
       'category/{${entity.category}}/'
       'publishTime/{${entity.publishTime}}/'
-      'tags/{${''}}/'
+      'tags/{${entity.tags}}/'
       'views/{${entity.views.toString()}}/'
       'likes/{${entity.likes.toString()}}/'
       'dislikes/{${entity.dislikes.toString()}}/'
@@ -97,37 +95,46 @@ class ApiService {
       'commentsDisabled/{${entity.commentsDisabled.toString()}}/'
       'ratingsDisabled/{${entity.ratingsDisabled.toString()}}/'
       'videoErrorOrRemoved/{${entity.videoErrorOrRemoved.toString()}}/'
-      'description/{${entity.description}}',
+      'description/{"${entity.description}"}',
     );
 
     final response = await http.post(uri);
 
     if (response.statusCode == 200) {
-      print('data inserted');
-      //TODO: Success snackbar?
+      print('New entity added response okay');
     } else {
-      throw Exception('Failed to insert data');
+      throw Exception('Failed to insert new entity');
     }
   }
 
-  Future<void> deleteEntity(String videoID) async {
+  Future<void> deleteEntity(String videoID, String views) async {
+    print('deleting entity');
+
     final uri = Uri.http(
       apiUrl,
-      'ytanalytics/remove/{$videoID}',
+      'ytanalytics/remove/'
+      'videoID/{$videoID}/'
+      'views/{$views}',
     );
 
     final response = await http.post(uri);
 
     if (response.statusCode == 200) {
-      print('data deleted');
-      //TODO: Success snackbar?
+      print('data deleted successfully');
     } else {
       throw Exception('Failed to delete data');
     }
   }
 
-  Future<void> updateEntity(String videoID, String oldViews, String views,
-      String likes, String dislikes) async {
+  Future<void> updateEntity(
+    String videoID,
+    String oldViews,
+    String views,
+    String likes,
+    String dislikes,
+  ) async {
+    print('updating entity');
+
     final uri = Uri.http(
       apiUrl,
       'ytanalytics/'
@@ -141,36 +148,34 @@ class ApiService {
     final response = await http.post(uri);
 
     if (response.statusCode == 200) {
-      print('data updated');
-      //TODO: Success snackbar?
+      print('data updated successfully');
     } else {
       throw Exception('Failed to update data');
     }
   }
 
   Future<void> restore(String filePath) async {
-    print(filePath);
+    print('restoring data from $filePath');
+
     final uri = Uri.http(apiUrl, 'ytanalytics/restore/{$filePath}');
 
     final response = await http.post(uri);
 
     if (response.statusCode == 200) {
-      print('data restored');
-      //TODO: Success snackbar?
+      print('data successfully restored');
     } else {
       throw Exception('Failed to restore data');
     }
   }
 
   Future<void> backup(String filePath) async {
-    print(filePath);
+    print('backing up data to $filePath');
     final uri = Uri.http(apiUrl, 'ytanalytics/backup/{$filePath}');
 
     final response = await http.post(uri);
 
     if (response.statusCode == 200) {
-      print('data backed up');
-      //TODO: Success snackbar?
+      print('data successfully backed up');
     } else {
       throw Exception('Failed to backup data');
     }

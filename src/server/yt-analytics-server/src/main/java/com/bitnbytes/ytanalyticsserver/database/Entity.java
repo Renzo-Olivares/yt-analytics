@@ -77,30 +77,30 @@ public class Entity {
 	}
 
 	public String getDataCSV() {
-		String s = "" + videoID + ",";
-		s += trendingDate.format(DateTimeFormatter.ofPattern("yy.dd.MM")) + ",";
-		s += "" + title + ",";
-		s += "" + channelTitle + ",";
-		s += categoryId + ",";
+		StringBuilder s = new StringBuilder("" + videoID + ",");
+		s.append(trendingDate.format(DateTimeFormatter.ofPattern("yy.dd.MM"))).append(",");
+		s.append(title).append(",");
+		s.append(channelTitle).append(",");
+		s.append(categoryId).append(",");
 
-		s += publishTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ".000Z,";
+		s.append(publishTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).append(".000Z,");
 
 		int tagsSize = tags.size();
 		if (tagsSize == 0) {
-			s += "[none]";
+			s.append("[none]");
 		} else if (tagsSize == 1) {
-			s += tags.get(0);
+			s.append(tags.get(0));
 		} else {
-			s += tags.get(0);
+			s.append(tags.get(0));
 			for (int i = 1; i < tagsSize; i++) {
-				s += "|" + tags.get(i);
+				s.append("|").append(tags.get(i));
 			}
 		}
-		s += "," + views + "," + likes + "," + dislikes + "," + commentCount + ",";
-		s += "" + thumbnailLink + ",";
-		s += commentsDisabled + "," + ratingsDisabled + "," + videoErrorOrRemoved + "," + description + "";
+		s.append(",").append(views).append(",").append(likes).append(",").append(dislikes).append(",").append(commentCount).append(",");
+		s.append(thumbnailLink).append(",");
+		s.append(commentsDisabled).append(",").append(ratingsDisabled).append(",").append(videoErrorOrRemoved).append(",").append(description);
 
-		return s;
+		return s.toString();
 	}
 
 	public boolean equals(Entity e) {
@@ -284,7 +284,7 @@ public class Entity {
 		case 33:
 			return "Classics";
 		case 34:
-			return "Comedy";//why is there two comedys?
+			return "Comedy";
 		case 35:
 			return "Documentary";
 		case 36:

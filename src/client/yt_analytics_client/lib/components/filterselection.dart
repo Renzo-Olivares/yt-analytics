@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yt_analytics_client/constants.dart' as Constants;
 import 'package:yt_analytics_client/models/filtermanager.dart';
+import 'package:yt_analytics_client/tools/constants.dart' as constants;
+import 'package:yt_analytics_client/tools/utils.dart';
 
 enum FilterType {
   channelName,
@@ -13,58 +14,28 @@ enum FilterType {
   tags,
   dislikes,
 }
+final filterFormKey = GlobalKey<FormState>();
 
 class FilterSelection extends StatefulWidget {
+  const FilterSelection();
+
   @override
   _FilterSelectionState createState() => _FilterSelectionState();
 }
 
 class _FilterSelectionState extends State<FilterSelection> {
-  DateTime _trendingDate = DateTime.now();
-  DateTime _publishedDate = DateTime.now();
   String _dropdownValue;
-
-  // final _tagsController = TextEditingController();
   final _viewsController = TextEditingController();
   final _likesController = TextEditingController();
   final _dislikesController = TextEditingController();
-  // final _commentsController = TextEditingController();
   final _channelController = TextEditingController();
 
   bool commentsToggle = false;
 
-  Future<void> _showTrendingDatePicker(BuildContext context) async {
-    final selectedDate = await showDatePicker(
-      context: context,
-      initialDate: _trendingDate,
-      firstDate: DateTime(2015, 1),
-      lastDate: DateTime(2100),
-    );
-    if (selectedDate != null && selectedDate != _trendingDate) {
-      setState(() {
-        _trendingDate = selectedDate;
-      });
-    }
-  }
-
-  Future<void> _showPublishedDatePicker(BuildContext context) async {
-    final selectedDate = await showDatePicker(
-      context: context,
-      initialDate: _publishedDate,
-      firstDate: DateTime(2015, 1),
-      lastDate: DateTime(2100),
-    );
-    if (selectedDate != null && selectedDate != _publishedDate) {
-      setState(() {
-        _publishedDate = selectedDate;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      leading: Icon(Icons.filter_list_outlined),
+      leading: const Icon(Icons.filter_list_outlined),
       title: Text(
         'FILTER',
         style: Theme.of(context)
@@ -81,124 +52,89 @@ class _FilterSelectionState extends State<FilterSelection> {
             top: 16,
             bottom: 16,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _FilterColumn(
-                title: 'STATS',
-                filters: Column(
-                  children: [
-                    const SizedBox(height: 32),
-                    _FilterInput(
-                      controller: _viewsController,
-                      hint: 'More than x views',
-                      type: FilterType.views,
-                    ),
-                    const SizedBox(height: 16),
-                    _FilterInput(
-                      controller: _likesController,
-                      hint: 'More than x likes',
-                      type: FilterType.likes,
-                    ),
-                    const SizedBox(height: 16),
-                    _FilterInput(
-                      controller: _dislikesController,
-                      hint: 'More than x dislikes',
-                      type: FilterType.dislikes,
-                    ),
-                    const SizedBox(height: 16),
-                    // _FilterInput(
-                    //   controller: _commentsController,
-                    //   hint: 'More than x comments',
-                    //   type: FilterType.comments,
-                    // ),
-                  ],
+          child: Form(
+            key: filterFormKey,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _FilterColumn(
+                  title: 'STATS',
+                  filters: Column(
+                    children: [
+                      const SizedBox(height: 32),
+                      _FilterInput(
+                        controller: _viewsController,
+                        hint: 'More than x views',
+                        type: FilterType.views,
+                      ),
+                      const SizedBox(height: 16),
+                      _FilterInput(
+                        controller: _likesController,
+                        hint: 'More than x likes',
+                        type: FilterType.likes,
+                      ),
+                      const SizedBox(height: 16),
+                      _FilterInput(
+                        controller: _dislikesController,
+                        hint: 'More than x dislikes',
+                        type: FilterType.dislikes,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-              ),
-              _FilterColumn(
-                title: 'DATES',
-                filters: Column(
-                  children: [
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      child: Text('Trending Date'),
-                      onPressed: () {
-                        _showTrendingDatePicker(context);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      child: Text('Publish Date'),
-                      onPressed: () {
-                        _showPublishedDatePicker(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              // _FilterColumn(
-              //   title: 'TAGS',
-              //   filters: Column(
-              //     children: [
-              //       SizedBox(height: 32),
-              //       _FilterInput(
-              //         controller: _tagsController,
-              //         hint: 'Video Tags',
-              //         type: FilterType.tags,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              _FilterColumn(
-                title: 'VIDEO PROPERTIES',
-                filters: Column(
-                  children: [
-                    const SizedBox(height: 32),
-                    Row(children: [
-                      Switch(
-                        value: commentsToggle,
+                const SizedBox(width: 48),
+                _FilterColumn(
+                  title: 'VIDEO PROPERTIES',
+                  filters: Column(
+                    children: [
+                      const SizedBox(height: 32),
+                      Row(children: [
+                        Switch(
+                          value: commentsToggle,
+                          onChanged: (value) {
+                            setState(() {
+                              commentsToggle = value;
+                              Provider.of<FilterManager>(context, listen: false)
+                                  .commentsDisabled = value;
+                            });
+                          },
+                        ),
+                        Text(
+                          'Comments ${commentsToggle ? 'Enabled' : 'Disabled'}',
+                        )
+                      ]),
+                      const SizedBox(height: 16),
+                      _FilterInput(
+                        controller: _channelController,
+                        hint: 'Channel Name',
+                        type: FilterType.channelName,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButton<String>(
+                        hint: const Text('Category'),
+                        value: _dropdownValue,
                         onChanged: (value) {
                           setState(() {
-                            commentsToggle = value;
+                            _dropdownValue = value;
                             Provider.of<FilterManager>(context, listen: false)
-                                .commentsDisabled = value;
+                                .category = value;
                           });
                         },
+                        items: constants.categories
+                            .map<DropdownMenuItem<String>>((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                       ),
-                      Text(
-                        'Comments ${commentsToggle ? 'Enabled' : 'Disabled'}',
-                      )
-                    ]),
-                    const SizedBox(height: 16),
-                    _FilterInput(
-                      controller: _channelController,
-                      hint: 'Channel Name',
-                      type: FilterType.channelName,
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButton<String>(
-                      hint: Text('Category'),
-                      value: _dropdownValue,
-                      onChanged: (value) {
-                        setState(() {
-                          _dropdownValue = value;
-                          Provider.of<FilterManager>(context, listen: false)
-                              .category = value;
-                        });
-                      },
-                      items: Constants.categoriesDrop
-                          .map<DropdownMenuItem<String>>((value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -218,7 +154,13 @@ class _Divider extends StatelessWidget {
 }
 
 class _FilterInput extends StatelessWidget {
-  const _FilterInput({this.controller, this.hint, this.type});
+  const _FilterInput({
+    @required this.controller,
+    @required this.hint,
+    @required this.type,
+  })  : assert(controller != null),
+        assert(hint != null),
+        assert(type != null);
 
   final TextEditingController controller;
   final String hint;
@@ -227,9 +169,10 @@ class _FilterInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 200, maxHeight: 50),
-      child: TextField(
+      constraints: const BoxConstraints(maxWidth: 200, maxHeight: 50),
+      child: TextFormField(
         controller: controller,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         onChanged: (value) {
           switch (type) {
             case FilterType.channelName:
@@ -255,21 +198,44 @@ class _FilterInput extends StatelessWidget {
                   value;
               break;
             default:
+              break;
           }
         },
         decoration: InputDecoration(
           filled: true,
-          labelStyle: TextStyle(color: Colors.grey),
-          border: OutlineInputBorder(),
+          labelStyle: const TextStyle(color: Colors.grey),
+          border: const OutlineInputBorder(),
           labelText: hint,
         ),
+        validator: (value) {
+          switch (type) {
+            case FilterType.views:
+            case FilterType.likes:
+            case FilterType.dislikes:
+              if (!Utils.isDigit(value)) {
+                return 'Please enter a number';
+              }
+              break;
+            case FilterType.channelName:
+              break;
+            case FilterType.comments:
+              break;
+            case FilterType.videoName:
+              break;
+            default:
+              return null;
+          }
+          return null;
+        },
       ),
     );
   }
 }
 
 class _FilterColumn extends StatelessWidget {
-  const _FilterColumn({this.title, this.filters});
+  const _FilterColumn({@required this.title, @required this.filters})
+      : assert(title != null),
+        assert(filters != null);
   final String title;
   final Widget filters;
 

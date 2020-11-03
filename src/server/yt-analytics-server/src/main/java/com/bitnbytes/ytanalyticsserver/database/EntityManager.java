@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component("entityManager")
@@ -19,11 +20,6 @@ public class EntityManager {
     private final CsvReader csvReader;
 
     private void loadData(String filePath) throws IOException{
-//        if(filePath.charAt(0) == '{'){
-//            this.csvReader.read(filePath);
-//        }else{
-//            this.csvReader.read(filePath);
-//        }
         this.csvReader.read(filePath);
         entities.clear();
         entities.addAll(this.csvReader.getData());
@@ -57,7 +53,13 @@ public class EntityManager {
         filteredList.clear();
 
         for (Entity entity : entities) {
-            if((channelNameParam.equals("") || entity.channelTitle.equals(channelNameParam)) && (categoryParam.equals("") || categoryParam.equals("None") || (entity.getCategory()).equals(categoryParam)) && (commentsDisabledParam.equals("") || commentsDisabled.equals("null")|| entity.commentsDisabled == commentsToggle)&& (videoNameParam.equals("") || entity.title.equals(videoNameParam)) && (viewsParam.equals("") || entity.views >= Integer.parseInt(viewsParam)) && (likesParam.equals("") || entity.likes >= Integer.parseInt(likesParam)) && (dislikesParam.equals("") || entity.dislikes >= Integer.parseInt(dislikesParam))){
+            if((channelNameParam.equals("") || entity.channelTitle.toLowerCase().contains(channelNameParam.toLowerCase())) &&
+                    (categoryParam.equals("") || (entity.getCategory()).equals(categoryParam)) &&
+                    (entity.commentsDisabled == commentsToggle) &&
+                    (videoNameParam.equals("") || entity.title.toLowerCase().contains(videoNameParam.toLowerCase())) &&
+                    (viewsParam.equals("") || entity.views >= Integer.parseInt(viewsParam)) &&
+                    (likesParam.equals("") || entity.likes >= Integer.parseInt(likesParam)) &&
+                    (dislikesParam.equals("") || entity.dislikes >= Integer.parseInt(dislikesParam))){
                 filteredList.add(entity);
             }
         }
@@ -107,9 +109,12 @@ public class EntityManager {
         LocalDate ptrendingDate = LocalDate.parse(trendingDate.substring(1, trendingDate.length()-1),formatterTrendingDate);
         String ptitle = title.substring(1, title.length() - 1);
         String pchannelTitle = channelTitle.substring(1, channelTitle.length() - 1);
-        String pcategory = category.substring(1, category.length()-1);//
+        String pcategory = category.substring(1, category.length()-1);
         LocalDateTime ppublishTime = LocalDateTime.parse(publishTime.substring(1, publishTime.length()-1),formatterPublishDate);
-        ArrayList<String> ptags = new ArrayList<>();//
+        String ptagss = tags.substring(1, tags.length() - 1);
+        System.out.println(ptagss);
+        List<String> temp = Arrays.asList(ptagss.split("\\s*,\\s*"));
+        ArrayList<String> ptags = new ArrayList<>(temp);
         int pviews = Integer.parseInt(views.substring(1,views.length()- 1));
         int plikes = Integer.parseInt(likes.substring(1, likes.length()-1));
         int pdislikes = Integer.parseInt(dislikes.substring(1, dislikes.length()-1));
@@ -124,9 +129,10 @@ public class EntityManager {
         System.out.println(entities.size());
     }
 
-    public void removeEntity(String videoID) {
+    public void removeEntity(String videoID, String views) {
         String pvideoID = videoID.substring(1, videoID.length() -1 );
-        entities.removeIf(entity -> entity.videoID.equals(pvideoID));
+        int pviews = Integer.parseInt(views.substring(1, views.length() - 1));
+        entities.removeIf(entity -> entity.videoID.equals(pvideoID) && entity.views == pviews);
     }
 
     public void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes) {
@@ -137,12 +143,6 @@ public class EntityManager {
         int pdislikes = Integer.parseInt(dislikes.substring(1, dislikes.length()-1));
         int entityIdx = 0;
         Entity replace = null;
-
-        try {
-            replace = new Entity("");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         for(Entity entity: entities){
             if(entity.videoID.equals(pvideoID) && entity.views == poldViews){

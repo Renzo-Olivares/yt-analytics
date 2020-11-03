@@ -44,8 +44,8 @@ public class EntityServiceImpl implements EntityService{
     }
 
     @Override
-    public void removeEntity(String videoID) {
-        entityDatabase.removeEntity(videoID);
+    public void removeEntity(String videoID, String views) {
+        entityDatabase.removeEntity(videoID, views);
     }
 
     @Override
