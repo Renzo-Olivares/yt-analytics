@@ -161,7 +161,11 @@ public class EntityManager {
     public List<Entity> getTopTrendingByViews(int n) {
 		List<Entity> sortedList = getTopTrendingByViews(this.entities);
 		return sortedList.subList(0, n);
-	}
+    }
+    
+    public List<Entity> getTopTrendingByViews() {
+		return getTopTrendingByViews(this.entities);
+    }
 	
 	public List<Entity> getTopTrendingByViews(int n, List<Entity> entities) {
 		List<Entity> sortedList = getTopTrendingByViews(entities);
@@ -188,7 +192,11 @@ public class EntityManager {
 	public List<Entity> getTopTrendingByLikes(int n) {
 		List<Entity> sortedList = getTopTrendingByLikes(this.entities);
 		return sortedList.subList(0, n);
-	}
+    }
+    
+    public List<Entity> getTopTrendingByLikes() {
+		return getTopTrendingByLikes(this.entities);
+    }
 	
 	public List<Entity> getTopTrendingByLikes(int n, List<Entity> entities) {
 		List<Entity> sortedList = getTopTrendingByLikes(entities);
@@ -216,7 +224,11 @@ public class EntityManager {
 	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
 		List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(this.entities);
 		return sortedList.subList(0, n);
-	}
+    }
+    
+    public List<Entity> getTopTrendingByLikeDislikeRatio() {
+		return getTopTrendingByLikeDislikeRatio(this.entities);
+    }
 	
 	public List<Entity> getTopTrendingByLikeDislikeRatio(int n, List<Entity> entities) {
 		List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(entities);
