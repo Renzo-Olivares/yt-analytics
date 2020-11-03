@@ -379,6 +379,10 @@ public class Entity {
 		}
 	}
 
+	public double LikeDislikeRatio() {
+		return (double)likes / (double)dislikes;
+	}
+
 	public String toString() {
 		StringBuilder print = new StringBuilder(videoID + ",\t" + trendingDate + ",\t" + title + ",\t" + channelTitle + ",\t" + getCategory()
 				+ ",\t" + publishTime + ",\t");
