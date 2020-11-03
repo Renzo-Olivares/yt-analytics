@@ -156,12 +156,18 @@ public class EntityManager {
 
         entities.set(entityIdx, replace);
     }
+
     public List<Entity> getTopTrendingByViews(int n) {
-		List<Entity> sortedList = getTopTrendingByViews();
+		List<Entity> sortedList = getTopTrendingByViews(this.entities);
+		return sortedList.subList(0, n);
+	}
+	
+	public List<Entity> getTopTrendingByViews(int n, List<Entity> entities) {
+		List<Entity> sortedList = getTopTrendingByViews(entities);
 		return sortedList.subList(0, n);
 	}
 
-	public List<Entity> getTopTrendingByViews() {
+	public List<Entity> getTopTrendingByViews(List<Entity> entities) {
 		// sort list by views
 		List<Entity> sortedList = new ArrayList<Entity>();
 		entities.forEach(e -> sortedList.add(e));
@@ -179,11 +185,16 @@ public class EntityManager {
 	}
 
 	public List<Entity> getTopTrendingByLikes(int n) {
-		List<Entity> sortedList = getTopTrendingByLikes();
+		List<Entity> sortedList = getTopTrendingByLikes(this.entities);
+		return sortedList.subList(0, n);
+	}
+	
+	public List<Entity> getTopTrendingByLikes(int n, List<Entity> entities) {
+		List<Entity> sortedList = getTopTrendingByLikes(entities);
 		return sortedList.subList(0, n);
 	}
 
-	public List<Entity> getTopTrendingByLikes() {
+	public List<Entity> getTopTrendingByLikes(List<Entity> entities) {
 		// sort list by number of likes
 		List<Entity> sortedList = new ArrayList<Entity>();
 		entities.forEach(e -> sortedList.add(e));
@@ -202,11 +213,16 @@ public class EntityManager {
 	}
 
 	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
-		List<Entity> sortedList = getTopTrendingByLikeDislikeRatio();
+		List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(this.entities);
+		return sortedList.subList(0, n);
+	}
+	
+	public List<Entity> getTopTrendingByLikeDislikeRatio(int n, List<Entity> entities) {
+		List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(entities);
 		return sortedList.subList(0, n);
 	}
 
-	public List<Entity> getTopTrendingByLikeDislikeRatio() {
+	public List<Entity> getTopTrendingByLikeDislikeRatio(List<Entity> entities) {
 		// sort list by like/dislike ratio
 		List<Entity> sortedList = new ArrayList<Entity>();
 		entities.forEach(e -> sortedList.add(e));
@@ -225,5 +241,6 @@ public class EntityManager {
 		}
 		return sortedList;
 
-	}
+    }
+    
 }
