@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 @Component("entityManager")
 public class EntityManager {
@@ -156,4 +157,109 @@ public class EntityManager {
 
         entities.set(entityIdx, replace);
     }
+
+    public List<Entity> getTopTrendingByViews(int n) {
+        List<Entity> sortedList = getTopTrendingByViews(this.entities);
+        if(n > sortedList.size)return sortedList;
+		return sortedList.subList(0, n);
+    }
+    
+    public List<Entity> getTopTrendingByViews() {
+		return getTopTrendingByViews(this.entities);
+    }
+	
+	public List<Entity> getTopTrendingByViews(int n, List<Entity> entities) {
+        List<Entity> sortedList = getTopTrendingByViews(entities);
+        if(n > sortedList.size)return sortedList;
+		return sortedList.subList(0, n);
+	}
+
+	public List<Entity> getTopTrendingByViews(List<Entity> entities) {
+		// sort list by views
+		List<Entity> sortedList = new ArrayList<Entity>();
+		entities.forEach(e -> sortedList.add(e));
+//		for(int j = 0; j < sortedList.size(); j++) {
+//			int k = j;
+//			for (int i = j + 1; i < sortedList.size(); i++) {
+//				if(sortedList.get(k).getViews() < sortedList.get(i).getViews()) {
+//					k = i;
+//				}
+//			}
+//			Collections.swap(sortedList, j, k);
+//		}
+		sortedList.sort((Entity e1, Entity e2)->e2.getViews()-e1.getViews()); 
+		return sortedList;
+	}
+
+	public List<Entity> getTopTrendingByLikes(int n) {
+        List<Entity> sortedList = getTopTrendingByLikes(this.entities);
+        if(n > sortedList.size)return sortedList;
+		return sortedList.subList(0, n);
+    }
+    
+    public List<Entity> getTopTrendingByLikes() {
+		return getTopTrendingByLikes(this.entities);
+    }
+	
+	public List<Entity> getTopTrendingByLikes(int n, List<Entity> entities) {
+        List<Entity> sortedList = getTopTrendingByLikes(entities);
+        if(n > sortedList.size)return sortedList;
+		return sortedList.subList(0, n);
+	}
+
+	public List<Entity> getTopTrendingByLikes(List<Entity> entities) {
+		// sort list by number of likes
+		List<Entity> sortedList = new ArrayList<Entity>();
+		entities.forEach(e -> sortedList.add(e));
+//		for(int j = 0; j < sortedList.size(); j++) {
+//			int k = j;
+//			for (int i = j + 1; i < sortedList.size(); i++) {
+//				if(sortedList.get(k).getLikes() < sortedList.get(i).getLikes()) {
+//					k = i;
+//				}
+//			}
+//			Collections.swap(sortedList, j, k);
+//		}
+		sortedList.sort((Entity e1, Entity e2)->e2.getLikes()-e1.getLikes()); 
+		return sortedList;
+
+	}
+
+	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
+        List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(this.entities);
+        if(n > sortedList.size)return sortedList;
+		return sortedList.subList(0, n);
+    }
+    
+    public List<Entity> getTopTrendingByLikeDislikeRatio() {
+		return getTopTrendingByLikeDislikeRatio(this.entities);
+    }
+	
+	public List<Entity> getTopTrendingByLikeDislikeRatio(int n, List<Entity> entities) {
+        List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(entities);
+        if(n > sortedList.size)return sortedList;
+		return sortedList.subList(0, n);
+	}
+
+	public List<Entity> getTopTrendingByLikeDislikeRatio(List<Entity> entities) {
+		// sort list by like/dislike ratio
+		List<Entity> sortedList = new ArrayList<Entity>();
+		entities.forEach(e -> sortedList.add(e));
+		for(int j = 0; j < sortedList.size(); j++) {
+			int k = j;
+			for (int i = j + 1; i < sortedList.size(); i++) {
+				if(sortedList.get(k).LikeDislikeRatio() < sortedList.get(i).LikeDislikeRatio()) {
+					k = i;
+				}else if(sortedList.get(k).LikeDislikeRatio() == sortedList.get(i).LikeDislikeRatio()) {
+					if(sortedList.get(k).getLikes() < sortedList.get(i).getLikes()) {
+						k = i;
+					}
+				}
+			}
+			Collections.swap(sortedList, j, k);
+		}
+		return sortedList;
+
+    }
+    
 }
