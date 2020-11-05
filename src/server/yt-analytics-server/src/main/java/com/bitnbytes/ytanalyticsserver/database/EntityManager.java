@@ -296,14 +296,93 @@ public class EntityManager {
     }
 
     public List<TrendingChartData> getTopTrendingChannels() {
-        List<TrendingChartData> mockData = new ArrayList<TrendingChartData>();
-        mockData.add(new TrendingChartData("Comedy", 200));
-        mockData.add(new TrendingChartData("Entertainment", 400));
-        mockData.add(new TrendingChartData("Gaming", 400));
-        mockData.add(new TrendingChartData("Movies", 500));
-        mockData.add(new TrendingChartData("Music", 700));
-        mockData.add(new TrendingChartData("Shows", 1000));
-        return mockData;
+        Map<String, Integer> topChannels = new HashMap<>();
+        for(Entity entity : filteredList){
+            topChannels.put(entity.getChannelTitle(), topChannels.get(entity.getChannelTitle()) + 1);
+        }
+        List<TrendingChartData> realData = new ArrayList<TrendingChartData>();
+
+        int max1 = 0;
+        String max1Channel = "";
+
+        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
+            if(pair.getValue() > max1){
+                max1 = pair.getValue();
+                max1Channel = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max1Channel, max1));
+        topChannels.remove(max1Channel, max1);
+
+        int max2 = 0;
+        String max2Channel = "";
+
+        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
+            if(pair.getValue() > max2){
+                max2 = pair.getValue();
+                max2Channel = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max2Channel, max2));
+
+        topChannels.remove(max2Channel, max2);
+
+        int max3 = 0;
+        String max3Channel = "";
+
+        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
+            if(pair.getValue() > max3){
+                max3 = pair.getValue();
+                max3Channel = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max3Channel, max3));
+        topChannels.remove(max3Channel, max3);
+
+        int max4 = 0;
+        String max4Channel = "";
+
+        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
+            if(pair.getValue() > max4){
+                max4 = pair.getValue();
+                max4Channel = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max4Channel, max4));
+        topChannels.remove(max4Channel, max4);
+
+        int max5 = 0;
+        String max5Channel = "";
+
+        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
+            if(pair.getValue() > max5){
+                max5 = pair.getValue();
+                max5Channel = pair.getKey();
+            }
+        }
+        realData.add(new TrendingChartData(max5Channel, max5));
+        topChannels.remove(max5Channel, max5);
+
+        int max6 = 0;
+        String max6Channel = "";
+
+        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
+            if(pair.getValue() > max6){
+                max6 = pair.getValue();
+                max6Channel = pair.getKey();
+            }
+        }
+        realData.add(new TrendingChartData(max6Channel, max6));
+
+        topChannels.remove(max6Channel, max6);
+
+
+
+        return realData;
     }
 
     public List<TrendingChartData> getTopTrendingCategories() {
