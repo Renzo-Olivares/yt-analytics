@@ -8,4 +8,12 @@ public class TrendingChartData {
         this.xVal = xVal;
         this.yVal = yVal;
     }
+
+    public String getxVal(){
+        return xVal;
+    }
+
+    public int getyVal(){
+        return yVal;
+    }
 }

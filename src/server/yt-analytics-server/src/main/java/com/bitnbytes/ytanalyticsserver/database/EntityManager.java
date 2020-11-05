@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Collections;
+import java.util.*;
 
 @Component("entityManager")
 public class EntityManager {
@@ -299,10 +296,185 @@ public class EntityManager {
     }
 
     public List<TrendingChartData> getTopTrendingChannels() {
-        return null;
+        List<TrendingChartData> mockData = new ArrayList<TrendingChartData>();
+        mockData.add(new TrendingChartData("Comedy", 200));
+        mockData.add(new TrendingChartData("Entertainment", 400));
+        mockData.add(new TrendingChartData("Gaming", 400));
+        mockData.add(new TrendingChartData("Movies", 500));
+        mockData.add(new TrendingChartData("Music", 700));
+        mockData.add(new TrendingChartData("Shows", 1000));
+        return mockData;
     }
 
     public List<TrendingChartData> getTopTrendingCategories() {
-        return null;
+        Map<String, Integer> topCategories = new HashMap<>();
+            for (int i = 1; i < 33; i++) {
+                switch (i) {
+                    case 1:
+                        topCategories.put("Film & Animation", 0);
+                    case 2:
+                        topCategories.put("Autos & Vehicles", 0);
+                    case 3:
+                        topCategories.put("Music", 0);
+                    case 4:
+                        topCategories.put("Pets & Animals", 0);
+                    case 5:
+                        topCategories.put("Sports", 0);
+                    case 6:
+                        topCategories.put("Short Movies", 0);
+                    case 7:
+                        topCategories.put("Travel & Events", 0);
+                    case 8:
+                        topCategories.put("Gaming", 0);
+                    case 9:
+                        topCategories.put("Videoblogging", 0);
+                    case 10:
+                        topCategories.put("People & Blogs", 0);
+                    case 11:
+                        topCategories.put("Comedy", 0);
+                    case 12:
+                        topCategories.put("Entertainment", 0);
+                    case 13:
+                        topCategories.put("News & Politics", 0);
+                    case 14:
+                        topCategories.put("Howto & Style", 0);
+                    case 15:
+                        topCategories.put("Education", 0);
+                    case 16:
+                        topCategories.put("Science & Technology", 0);
+                    case 17:
+                        topCategories.put("Nonprofits & Activism", 0);
+                    case 18:
+                        topCategories.put("Movies", 0);
+                    case 19:
+                        topCategories.put("Anime/Animation", 0);
+                    case 20:
+                        topCategories.put("Action/Adventure", 0);
+                    case 21:
+                        topCategories.put("Classics", 0);
+                    case 22:
+                        topCategories.put("Comedy", 0);
+                    case 23:
+                        topCategories.put("Documentary", 0);
+                    case 24:
+                        topCategories.put("Drama", 0);
+                    case 25:
+                        topCategories.put("Family", 0);
+                    case 26:
+                        topCategories.put("Foreign", 0);
+                    case 27:
+                        topCategories.put("Horror", 0);
+                    case 28:
+                        topCategories.put("Sci-Fi/Fantasy", 0);
+                    case 29:
+                        topCategories.put("Thriller", 0);
+                    case 30:
+                        topCategories.put("Shorts", 0);
+                    case 31:
+                        topCategories.put("Shows", 0);
+                    case 32:
+                        topCategories.put("Trailers", 0);
+                    default:
+                        topCategories.put("ERROR", 0);
+                }
+
+            }
+
+        for(Entity entity : filteredList){
+            topCategories.put(entity.getCategory(), topCategories.get(entity.getCategory()) + 1);
+        }
+
+        List<TrendingChartData> realData = new ArrayList<TrendingChartData>();
+
+        int max1 = 0;
+        String max1Cat = "";
+
+        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
+            if(pair.getValue() > max1){
+                max1 = pair.getValue();
+                max1Cat = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max1Cat, max1));
+        topCategories.remove(max1Cat, max1);
+
+        int max2 = 0;
+        String max2Cat = "";
+
+        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
+            if(pair.getValue() > max2){
+                max2 = pair.getValue();
+                max2Cat = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max2Cat, max2));
+
+        topCategories.remove(max2Cat, max2);
+
+        int max3 = 0;
+        String max3Cat = "";
+
+        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
+            if(pair.getValue() > max3){
+                max3 = pair.getValue();
+                max3Cat = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max3Cat, max3));
+        topCategories.remove(max3Cat, max3);
+
+        int max4 = 0;
+        String max4Cat = "";
+
+        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
+            if(pair.getValue() > max4){
+                max4 = pair.getValue();
+                max4Cat = pair.getKey();
+            }
+        }
+
+        realData.add(new TrendingChartData(max4Cat, max4));
+        topCategories.remove(max4Cat, max4);
+
+        int max5 = 0;
+        String max5Cat = "";
+
+        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
+            if(pair.getValue() > max5){
+                max5 = pair.getValue();
+                max5Cat = pair.getKey();
+            }
+        }
+        realData.add(new TrendingChartData(max5Cat, max5));
+        topCategories.remove(max5Cat, max5);
+
+        int max6 = 0;
+        String max6Cat = "";
+
+        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
+            if(pair.getValue() > max6){
+                max6 = pair.getValue();
+                max6Cat = pair.getKey();
+            }
+        }
+        realData.add(new TrendingChartData(max6Cat, max6));
+
+        topCategories.remove(max6Cat, max6);
+
+
+
+        return realData;
+
+//        List<TrendingChartData> mockData = new ArrayList<TrendingChartData>();
+//        mockData.add(new TrendingChartData("PewDiePie", 200));
+//        mockData.add(new TrendingChartData("JerryRigEverything", 400));
+//        mockData.add(new TrendingChartData("CNN", 400));
+//        mockData.add(new TrendingChartData("KSI", 500));
+//        mockData.add(new TrendingChartData("Logan Paul", 700));
+//        mockData.add(new TrendingChartData("MKBHD", 1000));
+//        return mockData;
     }
 }

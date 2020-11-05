@@ -51,16 +51,16 @@ class _SearchBarState extends State<SearchBar> {
                               .route ==
                           'Analytics') {
                         print('analytics');
-                        // Provider.of<EntityManager>(context, listen: false)
-                        //     .loadFilteredAnalytics(
-                        //   model.category,
-                        //   (!model.commentsDisabled).toString(),
-                        //   _searchBarController.text,
-                        //   model.views,
-                        //   model.likes,
-                        //   model.dislikes,
-                        //   model.channelName,
-                        // );
+                        Provider.of<EntityManager>(context, listen: false)
+                            .loadFilteredAnalytics(
+                          model.category,
+                          (!model.commentsDisabled).toString(),
+                          _searchBarController.text,
+                          model.views,
+                          model.likes,
+                          model.dislikes,
+                          model.channelName,
+                        );
                         Provider.of<EntityManager>(context, listen: false)
                             .setTopTrendingN('10');
                       } else if (Provider.of<RouteManager>(context,

@@ -22,45 +22,43 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         const SizedBox(height: 20),
         const FilterSelection(),
         const SizedBox(height: 40),
-        // Consumer<EntityManager>(
-        //   builder: (context, model, child) {
-        //     return _TrendingBarChart(
-        //       barChartData: model.trendingCategories ??
-        //           Future<List<TrendingChartData>>(() => null),
-        //       title: 'Categories',
-        //     );
-        //   },
-        // ),
-        // Consumer<EntityManager>(
-        //   builder: (context, model, child) {
-        //     return _TrendingBarChart(
-        //       barChartData: model.trendingChannels ??
-        //           Future<List<TrendingChartData>>(() => null),
-        //       title: 'Channels',
-        //     );
-        //   },
-        // ),
         Consumer<EntityManager>(
           builder: (context, model, child) {
-            return FutureBuilder(
-              future: model.topTrendingN ?? Future<List<Entity>>(() => null),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return const CircularProgressIndicator();
-                  default:
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      final trendingData =
-                          snapshot.data as List<Entity> ?? <Entity>[];
-                      print(trendingData.length);
-                      print('lol');
-                      return ConstrainedBox(
-                        constraints:
-                            const BoxConstraints(maxWidth: 800, maxHeight: 800),
-                        child: ListView.builder(
+            return _TrendingBarChart(
+              barChartData: model.trendingCategories ??
+                  Future<List<TrendingChartData>>(() => null),
+              title: 'Categories',
+            );
+          },
+        ),
+        Consumer<EntityManager>(
+          builder: (context, model, child) {
+            return _TrendingBarChart(
+              barChartData: model.trendingChannels ??
+                  Future<List<TrendingChartData>>(() => null),
+              title: 'Channels',
+            );
+          },
+        ),
+        Flexible(
+          child: Consumer<EntityManager>(
+            builder: (context, model, child) {
+              return FutureBuilder(
+                future: model.topTrendingN ?? Future<List<Entity>>(() => null),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return const CircularProgressIndicator();
+                    default:
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        final trendingData =
+                            snapshot.data as List<Entity> ?? <Entity>[];
+                        print(trendingData.length);
+                        print('lol');
+                        return ListView.builder(
                           itemCount: trendingData.length,
                           itemBuilder: (context, index) {
                             return ListTile(
@@ -69,13 +67,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                               ),
                             );
                           },
-                        ),
-                      );
-                    }
-                }
-              },
-            );
-          },
+                        );
+                      }
+                  }
+                },
+              );
+            },
+          ),
         ),
       ],
     );
