@@ -160,7 +160,7 @@ public class EntityManager {
 
     public List<Entity> getTopTrendingByViews(int n) {
         List<Entity> sortedList = getTopTrendingByViews(this.entities);
-        if(n > sortedList.size)return sortedList;
+        if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
     }
     
@@ -170,7 +170,7 @@ public class EntityManager {
 	
 	public List<Entity> getTopTrendingByViews(int n, List<Entity> entities) {
         List<Entity> sortedList = getTopTrendingByViews(entities);
-        if(n > sortedList.size)return sortedList;
+        if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
 	}
 
@@ -193,7 +193,7 @@ public class EntityManager {
 
 	public List<Entity> getTopTrendingByLikes(int n) {
         List<Entity> sortedList = getTopTrendingByLikes(this.entities);
-        if(n > sortedList.size)return sortedList;
+        if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
     }
     
@@ -203,7 +203,7 @@ public class EntityManager {
 	
 	public List<Entity> getTopTrendingByLikes(int n, List<Entity> entities) {
         List<Entity> sortedList = getTopTrendingByLikes(entities);
-        if(n > sortedList.size)return sortedList;
+        if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
 	}
 
@@ -227,7 +227,7 @@ public class EntityManager {
 
 	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
         List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(this.entities);
-        if(n > sortedList.size)return sortedList;
+        if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
     }
     
@@ -237,7 +237,7 @@ public class EntityManager {
 	
 	public List<Entity> getTopTrendingByLikeDislikeRatio(int n, List<Entity> entities) {
         List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(entities);
-        if(n > sortedList.size)return sortedList;
+        if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
 	}
 
