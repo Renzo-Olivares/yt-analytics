@@ -298,6 +298,10 @@ public class EntityManager {
     public List<TrendingChartData> getTopTrendingChannels() {
         Map<String, Integer> topChannels = new HashMap<>();
         for(Entity entity : filteredList){
+            topChannels.put(entity.getChannelTitle(), 0);
+        }
+
+        for(Entity entity : filteredList){
             topChannels.put(entity.getChannelTitle(), topChannels.get(entity.getChannelTitle()) + 1);
         }
         List<TrendingChartData> realData = new ArrayList<TrendingChartData>();
