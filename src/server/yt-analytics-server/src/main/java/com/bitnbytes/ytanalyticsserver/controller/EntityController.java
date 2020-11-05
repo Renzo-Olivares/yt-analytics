@@ -30,6 +30,12 @@ public class EntityController {
         return new ResponseEntity<>(entityService.getAllEntities(), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/analytics/topTrendingN/{n}", method = RequestMethod.GET)
+    public ResponseEntity<List<Entity>> getTopTrendingN(@PathVariable String n){
+        System.out.println("Client requesting all data from server");
+        return new ResponseEntity<>(entityService.getTopTrendingN(n), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/entitiesFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}", method = RequestMethod.GET)
     public ResponseEntity<List<Entity>> getFilteredData(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes){
         System.out.println("Client requesting filtered data from server");

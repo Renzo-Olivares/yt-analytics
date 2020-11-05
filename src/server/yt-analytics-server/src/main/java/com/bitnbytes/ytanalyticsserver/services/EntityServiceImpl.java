@@ -59,4 +59,9 @@ public class EntityServiceImpl implements EntityService{
         System.out.println(videoID);
         entityDatabase.updateEntity(videoID, oldViews, views, likes, dislikes);
     }
+
+    @Override
+    public List<Entity> getTopTrendingN(String n) {
+        return entityDatabase.getTopTrendingByLikeDislikeRatio(Integer.parseInt(n));
+    }
 }

@@ -10,6 +10,15 @@ class EntityManager with ChangeNotifier {
 
   Future<List<Entity>> get entities => _entities;
 
+  Future<List<Entity>> _topTrendingN;
+
+  Future<List<Entity>> get topTrendingN => _topTrendingN;
+
+  void setTopTrendingN(String n) {
+    _topTrendingN = api.getTopTrendingN(n);
+    notifyListeners();
+  }
+
   Future<List<TrendingChartData>> _trendingCategories;
 
   Future<List<TrendingChartData>> _trendingChannels;
