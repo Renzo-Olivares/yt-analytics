@@ -2,6 +2,7 @@ package com.bitnbytes.ytanalyticsserver.services;
 
 import com.bitnbytes.ytanalyticsserver.database.Entity;
 import com.bitnbytes.ytanalyticsserver.database.EntityManager;
+import com.bitnbytes.ytanalyticsserver.database.TrendingChartData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,11 @@ public class EntityServiceImpl implements EntityService{
     @Override
     public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes) {
         return entityDatabase.getEntitiesByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+    }
+
+    @Override
+    public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
+        return entityDatabase.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes, type);
     }
 
     @Override

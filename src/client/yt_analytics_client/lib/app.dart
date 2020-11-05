@@ -4,6 +4,7 @@ import 'package:yt_analytics_client/colors.dart';
 import 'package:yt_analytics_client/home.dart';
 import 'package:yt_analytics_client/models/entitymanager.dart';
 import 'package:yt_analytics_client/models/filtermanager.dart';
+import 'package:yt_analytics_client/models/routemanager.dart';
 
 class App extends StatelessWidget {
   @override
@@ -12,6 +13,7 @@ class App extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<EntityManager>.value(value: EntityManager()),
         ChangeNotifierProvider<FilterManager>.value(value: FilterManager()),
+        ChangeNotifierProvider<RouteManager>.value(value: RouteManager()),
       ],
       child: MaterialApp(
         title: 'BitNBytes Analytics',

@@ -5,7 +5,6 @@ class FilterManager with ChangeNotifier {
   bool _commentsDisabled = false;
   String _videoName = '';
   String _views = '';
-  String _comments = '';
   String _likes = '';
   String _dislikes = '';
   String _channelName = '';
@@ -17,7 +16,6 @@ class FilterManager with ChangeNotifier {
   String get likes => _likes;
   String get dislikes => _dislikes;
   String get channelName => _channelName;
-  String get comments => _comments;
 
   set category(String category) {
     _category = category;
@@ -26,11 +24,6 @@ class FilterManager with ChangeNotifier {
 
   set commentsDisabled(bool commentsDisabled) {
     _commentsDisabled = commentsDisabled;
-    notifyListeners();
-  }
-
-  set comments(String comments) {
-    _comments = comments;
     notifyListeners();
   }
 
@@ -56,6 +49,17 @@ class FilterManager with ChangeNotifier {
 
   set channelName(String channelName) {
     _channelName = channelName;
+    notifyListeners();
+  }
+
+  void resetFilters() {
+    _category = '';
+    _commentsDisabled = false;
+    _videoName = '';
+    _views = '';
+    _likes = '';
+    _dislikes = '';
+    _channelName = '';
     notifyListeners();
   }
 }

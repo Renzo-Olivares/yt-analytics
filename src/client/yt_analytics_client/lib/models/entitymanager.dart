@@ -2,12 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:yt_analytics_client/models/entity.dart';
+import 'package:yt_analytics_client/models/trendingchartdata.dart';
 import 'package:yt_analytics_client/services/apiservice.dart';
 
 class EntityManager with ChangeNotifier {
   Future<List<Entity>> _entities;
 
   Future<List<Entity>> get entities => _entities;
+
+  Future<List<TrendingChartData>> _trendingCategories;
+
+  Future<List<TrendingChartData>> _trendingChannels;
+
+  Future<List<TrendingChartData>> get trendingCategories => _trendingCategories;
+  Future<List<TrendingChartData>> get trendingChannels => _trendingChannels;
 
   int _selectedCount = 0;
 
@@ -61,6 +69,77 @@ class EntityManager with ChangeNotifier {
       likes: likes,
       dislikes: dislikes,
       channelName: channelName,
+    );
+
+    notifyListeners();
+  }
+
+  void loadFilteredAnalytics(
+    String category,
+    String commentsDisabled,
+    String videoName,
+    String views,
+    String likes,
+    String dislikes,
+    String channelName,
+  ) {
+    if ((category == '' || category == 'None') &&
+        commentsDisabled == 'null' &&
+        videoName == '' &&
+        views == '' &&
+        likes == '' &&
+        dislikes == '' &&
+        channelName == '') {
+      loadAllAnalytics();
+      notifyListeners();
+      return;
+    }
+
+    _trendingChannels = api.getFilteredAnalytics(
+      category: category,
+      commentsDisabled: commentsDisabled,
+      videoName: videoName,
+      views: views,
+      likes: likes,
+      dislikes: dislikes,
+      channelName: channelName,
+      type: 'Channels',
+    );
+
+    _trendingCategories = api.getFilteredAnalytics(
+      category: category,
+      commentsDisabled: commentsDisabled,
+      videoName: videoName,
+      views: views,
+      likes: likes,
+      dislikes: dislikes,
+      channelName: channelName,
+      type: 'Categories',
+    );
+    notifyListeners();
+  }
+
+  void loadAllAnalytics() {
+    _trendingChannels = api.getFilteredAnalytics(
+      category: '',
+      commentsDisabled: '',
+      videoName: '',
+      views: '',
+      likes: '',
+      dislikes: '',
+      channelName: '',
+      type: 'Channels',
+    );
+
+    _trendingCategories = api.getFilteredAnalytics(
+      category: '',
+      commentsDisabled: '',
+      videoName: '',
+      views: '',
+      likes: '',
+      dislikes: '',
+      channelName: '',
+      type: 'Categories',
     );
 
     notifyListeners();

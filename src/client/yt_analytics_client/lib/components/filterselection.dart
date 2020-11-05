@@ -10,7 +10,6 @@ enum FilterType {
   videoName,
   views,
   likes,
-  comments,
   tags,
   dislikes,
 }
@@ -179,10 +178,6 @@ class _FilterInput extends StatelessWidget {
               Provider.of<FilterManager>(context, listen: false).channelName =
                   value;
               break;
-            case FilterType.comments:
-              Provider.of<FilterManager>(context, listen: false).comments =
-                  value;
-              break;
             case FilterType.videoName:
               Provider.of<FilterManager>(context, listen: false).videoName =
                   value;
@@ -217,8 +212,6 @@ class _FilterInput extends StatelessWidget {
               }
               break;
             case FilterType.channelName:
-              break;
-            case FilterType.comments:
               break;
             case FilterType.videoName:
               break;

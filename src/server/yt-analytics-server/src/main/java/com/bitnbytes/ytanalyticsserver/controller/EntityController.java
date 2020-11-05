@@ -1,6 +1,7 @@
 package com.bitnbytes.ytanalyticsserver.controller;
 
 import com.bitnbytes.ytanalyticsserver.database.Entity;
+import com.bitnbytes.ytanalyticsserver.database.TrendingChartData;
 import com.bitnbytes.ytanalyticsserver.services.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,19 @@ public class EntityController {
 //        System.out.println(minLikes);
 //        System.out.println(minDislikes);
         return new ResponseEntity<>(entityService.getEntitiesByFilter(channelName, category, commentsDisabled, videoName, minViews, minLikes, minDislikes), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/analyticsFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}/type/{type}", method = RequestMethod.GET)
+    public ResponseEntity<List<TrendingChartData>> getFilteredAnalytics(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes, @PathVariable String type){
+        System.out.println("Client requesting filtered analytics from server");
+//        System.out.println(channelName);
+//        System.out.println(category);
+//        System.out.println(commentsDisabled);
+//        System.out.println(videoName);
+//        System.out.println(minViews);
+//        System.out.println(minLikes);
+//        System.out.println(minDislikes);
+        return new ResponseEntity<>(entityService.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, minViews, minLikes, minDislikes, type), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/backup/{filePath}", method = RequestMethod.POST)

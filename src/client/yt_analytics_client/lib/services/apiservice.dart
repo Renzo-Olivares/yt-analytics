@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:yt_analytics_client/models/entity.dart';
+import 'package:yt_analytics_client/models/trendingchartdata.dart';
 
 class ApiService {
   final String apiUrl = 'user:pass@localhost:8080';
@@ -71,6 +72,52 @@ class ApiService {
     } else {
       print('response for filtered data request not okay');
       throw Exception('Failed to load filtered server data');
+    }
+  }
+
+  Future<List<TrendingChartData>> getFilteredAnalytics({
+    String category = '',
+    String commentsDisabled = '',
+    String videoName = '',
+    String views = '',
+    String likes = '',
+    String dislikes = '',
+    String channelName = '',
+    String type = '',
+  }) async {
+    print('fetching filtered analytics');
+
+    final uri = Uri.http(
+      apiUrl,
+      'ytanalytics/analyticsFiltered/'
+      'channel/{$channelName}/'
+      'category/{$category}/'
+      'commentsDisabled/{$commentsDisabled}/'
+      'videoName/{$videoName}/'
+      'views/{$views}/'
+      'likes/{$likes}/'
+      'dislikes/{$dislikes}/'
+      'type/$type',
+    );
+
+    final response = await http.get(uri);
+
+    print('filtered analytics fetched');
+    final entities = <TrendingChartData>[];
+
+    if (response.statusCode == 200) {
+      print('response for filtered analytics request is okay');
+      final responseJson = jsonDecode(response.body) as List<dynamic>;
+
+      for (var response in responseJson) {
+        entities
+            .add(TrendingChartData.fromJson(response as Map<String, dynamic>));
+      }
+
+      return entities;
+    } else {
+      print('response for filtered analytics request not okay');
+      throw Exception('Failed to load filtered server analytics');
     }
   }
 

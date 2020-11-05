@@ -176,8 +176,7 @@ public class EntityManager {
 
 	public List<Entity> getTopTrendingByViews(List<Entity> entities) {
 		// sort list by views
-		List<Entity> sortedList = new ArrayList<Entity>();
-		entities.forEach(e -> sortedList.add(e));
+        List<Entity> sortedList = new ArrayList<Entity>(entities);
 //		for(int j = 0; j < sortedList.size(); j++) {
 //			int k = j;
 //			for (int i = j + 1; i < sortedList.size(); i++) {
@@ -209,8 +208,7 @@ public class EntityManager {
 
 	public List<Entity> getTopTrendingByLikes(List<Entity> entities) {
 		// sort list by number of likes
-		List<Entity> sortedList = new ArrayList<Entity>();
-		entities.forEach(e -> sortedList.add(e));
+        List<Entity> sortedList = new ArrayList<Entity>(entities);
 //		for(int j = 0; j < sortedList.size(); j++) {
 //			int k = j;
 //			for (int i = j + 1; i < sortedList.size(); i++) {
@@ -243,8 +241,7 @@ public class EntityManager {
 
 	public List<Entity> getTopTrendingByLikeDislikeRatio(List<Entity> entities) {
 		// sort list by like/dislike ratio
-		List<Entity> sortedList = new ArrayList<Entity>();
-		entities.forEach(e -> sortedList.add(e));
+        List<Entity> sortedList = new ArrayList<Entity>(entities);
 		for(int j = 0; j < sortedList.size(); j++) {
 			int k = j;
 			for (int i = j + 1; i < sortedList.size(); i++) {
@@ -261,5 +258,51 @@ public class EntityManager {
 		return sortedList;
 
     }
-    
+
+    public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
+        loadFilteredList(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+        if(type.equals("Categories")){
+            return getTopTrendingCategories();
+        }else{
+            return getTopTrendingChannels();
+        }
+    }
+
+    void loadFilteredList(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+        String channelNameParam = channelName.substring(1, channelName.length() - 1);
+        String categoryParam = category.substring(1, category.length() - 1);
+        String commentsDisabledParam = commentsDisabled.substring(1, commentsDisabled.length() - 1);
+        String videoNameParam = videoName.substring(1, videoName.length() - 1);
+        String viewsParam = views.substring(1, views.length() - 1);
+        String likesParam = likes.substring(1, likes.length() - 1);
+        String dislikesParam = dislikes.substring(1, dislikes.length() - 1);
+
+        boolean commentsToggle = false;
+
+        if(commentsDisabledParam.equals("true")){
+            commentsToggle = true;
+        }
+
+        filteredList.clear();
+
+        for (Entity entity : entities) {
+            if((channelNameParam.equals("") || entity.channelTitle.toLowerCase().contains(channelNameParam.toLowerCase())) &&
+                    (categoryParam.equals("") || (entity.getCategory()).equals(categoryParam)) &&
+                    (entity.commentsDisabled == commentsToggle) &&
+                    (videoNameParam.equals("") || entity.title.toLowerCase().contains(videoNameParam.toLowerCase())) &&
+                    (viewsParam.equals("") || entity.views >= Integer.parseInt(viewsParam)) &&
+                    (likesParam.equals("") || entity.likes >= Integer.parseInt(likesParam)) &&
+                    (dislikesParam.equals("") || entity.dislikes >= Integer.parseInt(dislikesParam))){
+                filteredList.add(entity);
+            }
+        }
+    }
+
+    public List<TrendingChartData> getTopTrendingChannels() {
+        return null;
+    }
+
+    public List<TrendingChartData> getTopTrendingCategories() {
+        return null;
+    }
 }
