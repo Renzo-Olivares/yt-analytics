@@ -560,4 +560,19 @@ public class EntityManager {
 //        mockData.add(new TrendingChartData("MKBHD", 1000));
 //        return mockData;
     }
+
+    public int tagAverage(List<Entity> list) {
+        int sum = 0;
+        for(Entity e : list) {
+            sum += e.tags.size();
+        }
+        return sum/list.size();
+    }
+
+    public int tagAverage() {
+        return tagAverage(this.entities);
+    }
+
+    
+
 }
