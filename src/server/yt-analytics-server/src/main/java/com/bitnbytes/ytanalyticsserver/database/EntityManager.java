@@ -573,6 +573,47 @@ public class EntityManager {
         return tagAverage(this.entities);
     }
 
-    
+    public List<List<Entity>> compressDuplicatedVideos(){
+        return this.compressDuplicatedVideos(this.entities);
+    }
+
+    public List<List<Entity>> compressDuplicatedVideos(List<Entity> list){
+        List<List<Entity>> mappedVideos = new ArrayList<>();
+        for(Entity e : list) {
+            boolean found = false;
+            for(List<Entity> l : mappedVideos) {
+                if(l.get(0).getVideoID().equals(e.getVideoID())) {
+                    l.add(e);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                List<Entity> newVal = new ArrayList<>();
+                newVal.add(e);
+                mappedVideos.add(newVal);
+            }
+        }
+        return mappedVideos;
+    }
+
+    public List<Entity> trendingNDays(int n){
+        return trendingNDaysUnCompressedArg(this.entities, n);
+    }
+
+    public List<Entity> trendingNDaysUnCompressedArg(List<Entity> list, int n){
+        return trendingNDaysCompressedArg(compressDuplicatedVideos(list), n);
+    }
+
+    public List<Entity> trendingNDaysCompressedArg(List<List<Entity>> compressedList, int n){//returns only the first video.
+        List<Entity> list = new ArrayList<>();
+        if(n < 1)return list;
+        for(List<Entity> l : compressedList) {
+            if(l.size() == n) {
+                list.add(l.get(0));
+            }
+        }
+        return list;
+    }
 
 }
