@@ -575,7 +575,9 @@ public class EntityManager {
             }
             if(!found) {
                 TrendingChartData t = new TrendingChartData(e.getCategory(), e.getTags().size());
+                TrendingChartData n = new TrendingChartData(e.getCategory(), 1);
                 chart.add(t);
+                numVideos.add(n);
             }else {
                 for(TrendingChartData t : numVideos) {
                     if(t.getxVal().equals(e.getCategory())) {
@@ -594,6 +596,7 @@ public class EntityManager {
             }
 
         }
+        chart.sort((TrendingChartData t1, TrendingChartData t2)->t2.getyVal()-t1.getyVal());
         return chart;
     }
 
