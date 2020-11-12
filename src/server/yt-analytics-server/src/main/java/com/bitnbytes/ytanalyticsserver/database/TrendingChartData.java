@@ -16,4 +16,6 @@ public class TrendingChartData {
     public int getyVal(){
         return yVal;
     }
+
+    public void setyVal(int newyVal) {this.yVal = newyVal;}
 }

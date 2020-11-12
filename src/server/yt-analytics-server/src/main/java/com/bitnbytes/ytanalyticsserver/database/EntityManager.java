@@ -561,6 +561,42 @@ public class EntityManager {
 //        return mockData;
     }
 
+    public List<TrendingChartData> getTagAverageCategory(){
+        List<TrendingChartData> chart = new ArrayList<>(), numVideos = new ArrayList<>();
+
+        for(Entity e : this.entities) {
+            boolean found = false;
+            for(TrendingChartData t : chart) {
+                if(t.getxVal().equals(e.getCategory())) {
+                    t.setyVal(t.getyVal() + e.getTags().size());
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                TrendingChartData t = new TrendingChartData(e.getCategory(), e.getTags().size());
+                chart.add(t);
+            }else {
+                for(TrendingChartData t : numVideos) {
+                    if(t.getxVal().equals(e.getCategory())) {
+                        t.setyVal(t.getyVal() + 1);
+                        break;
+                    }
+                }
+            }
+        }
+        for(TrendingChartData t : chart) {
+            for(TrendingChartData n : numVideos) {
+                if(t.getxVal().equals(n.getxVal())) {
+                    t.setyVal(t.getyVal()/n.getyVal());
+                    break;
+                }
+            }
+
+        }
+        return chart;
+    }
+
     public int getTagAverage(List<Entity> list) {
         int sum = 0;
         for(Entity e : list) {
