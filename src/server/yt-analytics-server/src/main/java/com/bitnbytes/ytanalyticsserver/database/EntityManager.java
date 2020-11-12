@@ -561,7 +561,7 @@ public class EntityManager {
 //        return mockData;
     }
 
-    public int tagAverage(List<Entity> list) {
+    public int getTagAverage(List<Entity> list) {
         int sum = 0;
         for(Entity e : list) {
             sum += e.tags.size();
@@ -569,15 +569,15 @@ public class EntityManager {
         return sum/list.size();
     }
 
-    public int tagAverage() {
-        return tagAverage(this.entities);
+    public int getTagAverage() {
+        return getTagAverage(this.entities);
     }
 
-    public List<List<Entity>> compressDuplicatedVideos(){
-        return this.compressDuplicatedVideos(this.entities);
+    public List<List<Entity>> getCompressDuplicatedVideos(){
+        return this.getCompressDuplicatedVideos(this.entities);
     }
 
-    public List<List<Entity>> compressDuplicatedVideos(List<Entity> list){
+    public List<List<Entity>> getCompressDuplicatedVideos(List<Entity> list){
         List<List<Entity>> mappedVideos = new ArrayList<>();
         for(Entity e : list) {
             boolean found = false;
@@ -597,15 +597,15 @@ public class EntityManager {
         return mappedVideos;
     }
 
-    public List<Entity> trendingNDays(int n){
-        return trendingNDaysUnCompressedArg(this.entities, n);
+    public List<Entity> getTrendingNDays(int n){
+        return getTrendingNDaysUnCompressedArg(this.entities, n);
     }
 
-    public List<Entity> trendingNDaysUnCompressedArg(List<Entity> list, int n){
-        return trendingNDaysCompressedArg(compressDuplicatedVideos(list), n);
+    public List<Entity> getTrendingNDaysUnCompressedArg(List<Entity> list, int n){
+        return getTrendingNDaysCompressedArg(getCompressDuplicatedVideos(list), n);
     }
 
-    public List<Entity> trendingNDaysCompressedArg(List<List<Entity>> compressedList, int n){//returns only the first video.
+    public List<Entity> getTrendingNDaysCompressedArg(List<List<Entity>> compressedList, int n){//returns only the first video.
         List<Entity> list = new ArrayList<>();
         if(n < 1)return list;
         for(List<Entity> l : compressedList) {
@@ -614,6 +614,20 @@ public class EntityManager {
             }
         }
         return list;
+    }
+
+    public int getDaysTrending(String VideoID) {
+        int daysTrending = 0;
+        for(Entity e : this.entities) {
+            if(e.getVideoID().equals(VideoID)) {
+                ++daysTrending;
+            }
+        }
+        return daysTrending;
+    }
+
+    public int getDaysTrending(Entity video) {
+        return getDaysTrending(video.getVideoID());
     }
 
 }

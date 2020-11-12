@@ -379,6 +379,10 @@ public class Entity {
 		}
 	}
 
+	public int getCategoryId() {
+		return this.categoryId;
+	}
+
 	public double LikeDislikeRatio() {
 		return (double)likes / (double)dislikes;
 	}
