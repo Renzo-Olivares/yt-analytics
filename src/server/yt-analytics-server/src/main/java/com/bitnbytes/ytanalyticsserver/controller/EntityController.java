@@ -30,6 +30,12 @@ public class EntityController {
         return new ResponseEntity<>(entityService.getAllEntities(), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/analytics/trendingdays/{days}", method = RequestMethod.GET)
+    public ResponseEntity<List<Entity>> getAllData(@PathVariable String days){
+        System.out.println("Client trending n days");
+        return new ResponseEntity<>(entityService.getTrendingNDays(days), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/analytics/topTrendingN/{n}", method = RequestMethod.GET)
     public ResponseEntity<List<Entity>> getTopTrendingN(@PathVariable String n){
         System.out.println("Client requesting all data from server");

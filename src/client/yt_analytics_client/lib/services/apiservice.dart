@@ -56,6 +56,30 @@ class ApiService {
     }
   }
 
+  Future<List<Entity>> getTrendingNDays(String n) async {
+    print('fetching all top data');
+    final uri = Uri.http(apiUrl, 'ytanalytics/analytics/trendingdays/$n');
+
+    final response = await http.get(uri);
+
+    print('all top data fetched');
+    final entities = <Entity>[];
+
+    if (response.statusCode == 200) {
+      print('response for all top data fetch is okay');
+      final responseJson = jsonDecode(response.body) as List<dynamic>;
+
+      for (var response in responseJson) {
+        entities.add(Entity.fromJson(response as Map<String, dynamic>));
+      }
+
+      return entities;
+    } else {
+      print('response for all top data fetch not okay');
+      throw Exception('Failed to load all top server data');
+    }
+  }
+
   Future<List<Entity>> getFilteredEntities({
     String category = '',
     String commentsDisabled = '',

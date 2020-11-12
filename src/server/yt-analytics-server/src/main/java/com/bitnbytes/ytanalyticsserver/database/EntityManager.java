@@ -260,8 +260,10 @@ public class EntityManager {
         loadFilteredList(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
         if(type.equals("Categories")){
             return getTopTrendingCategories();
-        }else{
+        }else if(type.equals("Channels")){
             return getTopTrendingChannels();
+        }else{
+            return getTagAverageCategory();
         }
     }
 
@@ -564,7 +566,7 @@ public class EntityManager {
     public List<TrendingChartData> getTagAverageCategory(){
         List<TrendingChartData> chart = new ArrayList<>(), numVideos = new ArrayList<>();
 
-        for(Entity e : this.entities) {
+        for(Entity e : this.filteredList) {
             boolean found = false;
             for(TrendingChartData t : chart) {
                 if(t.getxVal().equals(e.getCategory())) {
@@ -597,7 +599,7 @@ public class EntityManager {
 
         }
         chart.sort((TrendingChartData t1, TrendingChartData t2)->t2.getyVal()-t1.getyVal());
-        return chart;
+        return chart.subList(0,6);
     }
 
     public int getTagAverage(List<Entity> list) {

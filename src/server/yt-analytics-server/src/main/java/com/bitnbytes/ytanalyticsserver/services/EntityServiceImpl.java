@@ -64,4 +64,9 @@ public class EntityServiceImpl implements EntityService{
     public List<Entity> getTopTrendingN(String n) {
         return entityDatabase.getTopTrendingByLikeDislikeRatio(Integer.parseInt(n));
     }
+
+    @Override
+    public List<Entity> getTrendingNDays(String days) {
+        return entityDatabase.getTrendingNDays(Integer.parseInt(days));
+    }
 }

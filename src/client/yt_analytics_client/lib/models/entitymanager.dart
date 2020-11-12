@@ -11,20 +11,28 @@ class EntityManager with ChangeNotifier {
   Future<List<Entity>> get entities => _entities;
 
   Future<List<Entity>> _topTrendingN;
+  Future<List<Entity>> _trendingNDays;
 
   Future<List<Entity>> get topTrendingN => _topTrendingN;
+  Future<List<Entity>> get trendingNDays => _trendingNDays;
 
   void setTopTrendingN(String n) {
     _topTrendingN = api.getTopTrendingN(n);
     notifyListeners();
   }
 
-  Future<List<TrendingChartData>> _trendingCategories;
+  void setTrendingNDays(String n) {
+    _trendingNDays = api.getTrendingNDays(n);
+    notifyListeners();
+  }
 
+  Future<List<TrendingChartData>> _trendingCategories;
   Future<List<TrendingChartData>> _trendingChannels;
+  Future<List<TrendingChartData>> _avgTagsCategories;
 
   Future<List<TrendingChartData>> get trendingCategories => _trendingCategories;
   Future<List<TrendingChartData>> get trendingChannels => _trendingChannels;
+  Future<List<TrendingChartData>> get avgTagsCategories => _avgTagsCategories;
 
   int _selectedCount = 0;
 
@@ -125,6 +133,18 @@ class EntityManager with ChangeNotifier {
       channelName: channelName,
       type: 'Categories',
     );
+
+    _avgTagsCategories = api.getFilteredAnalytics(
+      category: category,
+      commentsDisabled: commentsDisabled,
+      videoName: videoName,
+      views: views,
+      likes: likes,
+      dislikes: dislikes,
+      channelName: channelName,
+      type: 'Tags',
+    );
+
     notifyListeners();
   }
 

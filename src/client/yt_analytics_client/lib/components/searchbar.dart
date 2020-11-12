@@ -63,6 +63,8 @@ class _SearchBarState extends State<SearchBar> {
                         );
                         Provider.of<EntityManager>(context, listen: false)
                             .setTopTrendingN('10');
+                        Provider.of<EntityManager>(context, listen: false)
+                            .setTrendingNDays(model.numofdays);
                       } else if (Provider.of<RouteManager>(context,
                                   listen: false)
                               .route ==

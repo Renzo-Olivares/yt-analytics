@@ -17,4 +17,5 @@ public interface EntityService {
     void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes);
 
     List<Entity> getTopTrendingN(String n);
+    List<Entity> getTrendingNDays(String days);
 }

@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:yt_analytics_client/components/filterselection.dart';
 import 'package:yt_analytics_client/models/entity.dart';
 import 'package:yt_analytics_client/models/entitymanager.dart';
+import 'package:yt_analytics_client/models/filtermanager.dart';
 import 'package:yt_analytics_client/models/trendingchartdata.dart';
+import 'package:yt_analytics_client/tools/utils.dart';
 
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage();
@@ -14,68 +16,185 @@ class AnalyticsPage extends StatefulWidget {
 }
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
+  final _numDaysController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const SizedBox(height: 20),
-        const FilterSelection(),
-        const SizedBox(height: 40),
-        Consumer<EntityManager>(
-          builder: (context, model, child) {
-            return _TrendingBarChart(
-              barChartData: model.trendingCategories ??
-                  Future<List<TrendingChartData>>(() => null),
-              title: 'Categories',
-            );
-          },
-        ),
-        Consumer<EntityManager>(
-          builder: (context, model, child) {
-            return _TrendingBarChart(
-              barChartData: model.trendingChannels ??
-                  Future<List<TrendingChartData>>(() => null),
-              title: 'Channels',
-            );
-          },
-        ),
-        Flexible(
-          child: Consumer<EntityManager>(
-            builder: (context, model, child) {
-              return FutureBuilder(
-                future: model.topTrendingN ?? Future<List<Entity>>(() => null),
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return const CircularProgressIndicator();
-                    default:
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        final trendingData =
-                            snapshot.data as List<Entity> ?? <Entity>[];
-                        print(trendingData.length);
-                        print('lol');
-                        return ListView.builder(
-                          itemCount: trendingData.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(
-                                '$index : ${trendingData[index].videoID} - ${trendingData[index].title}',
-                              ),
-                            );
+    return SizedBox(
+      height: double.infinity,
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 20),
+            const FilterSelection(),
+            const SizedBox(height: 40),
+            Consumer<EntityManager>(
+              builder: (context, model, child) {
+                return _TrendingBarChart(
+                  barChartData: model.trendingCategories ??
+                      Future<List<TrendingChartData>>(() => null),
+                  title: 'Categories',
+                );
+              },
+            ),
+            Consumer<EntityManager>(
+              builder: (context, model, child) {
+                return _TrendingBarChart(
+                  barChartData: model.trendingChannels ??
+                      Future<List<TrendingChartData>>(() => null),
+                  title: 'Channels',
+                );
+              },
+            ),
+            Consumer<EntityManager>(
+              builder: (context, model, child) {
+                return _TrendingBarChart(
+                  barChartData: model.avgTagsCategories ??
+                      Future<List<TrendingChartData>>(() => null),
+                  title: 'Categories Average # of Tags',
+                );
+              },
+            ),
+            Flexible(
+              child: Consumer<EntityManager>(
+                builder: (context, model, child) {
+                  return Container(
+                    color: const Color(0xff2c4260),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Top 10 Trending Videos',
+                          style: TextStyle(color: Colors.white, fontSize: 22),
+                        ),
+                        const SizedBox(height: 16),
+                        FutureBuilder(
+                          future: model.topTrendingN ??
+                              Future<List<Entity>>(() => null),
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                              case ConnectionState.waiting:
+                                return const CircularProgressIndicator();
+                              default:
+                                if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else {
+                                  final trendingData =
+                                      snapshot.data as List<Entity> ??
+                                          <Entity>[];
+                                  print(trendingData.length);
+                                  print('lol');
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: trendingData.length,
+                                    itemBuilder: (context, index) {
+                                      return ListTile(
+                                        leading: ExcludeSemantics(
+                                          child: CircleAvatar(
+                                            child: Text('${index + 1}'),
+                                          ),
+                                        ),
+                                        title: Text(
+                                          '${trendingData[index].videoID} - ${trendingData[index].title}',
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                            }
                           },
-                        );
-                      }
-                  }
+                        ),
+                      ],
+                    ),
+                  );
                 },
-              );
-            },
-          ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+                controller: _numDaysController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onChanged: (value) {
+                  Provider.of<FilterManager>(context, listen: false).numofdays =
+                      value;
+                },
+                decoration: const InputDecoration(
+                  filled: true,
+                  labelStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(),
+                  labelText: 'Number of Days',
+                ),
+                validator: (value) {
+                  if (!Utils.isDigit(value)) {
+                    return 'Please enter a number';
+                  }
+                  return null;
+                }),
+            Flexible(
+              child: Consumer<EntityManager>(
+                builder: (context, model, child) {
+                  return Container(
+                    color: const Color(0xff2c4260),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Videos Trending N Days',
+                          style: TextStyle(color: Colors.white, fontSize: 22),
+                        ),
+                        const SizedBox(height: 16),
+                        FutureBuilder(
+                          future: model.trendingNDays ??
+                              Future<List<Entity>>(() => null),
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                              case ConnectionState.waiting:
+                                return const CircularProgressIndicator();
+                              default:
+                                if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else {
+                                  final trendingData =
+                                      snapshot.data as List<Entity> ??
+                                          <Entity>[];
+                                  print(trendingData.length);
+                                  print('lol');
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: trendingData.length,
+                                    itemBuilder: (context, index) {
+                                      return ListTile(
+                                        leading: ExcludeSemantics(
+                                          child: CircleAvatar(
+                                            child: Text('${index + 1}'),
+                                          ),
+                                        ),
+                                        title: Text(
+                                          '${trendingData[index].videoID} - ${trendingData[index].title}',
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -99,7 +218,7 @@ class _TrendingBarChartState extends State<_TrendingBarChart> {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 400, maxWidth: 800),
+      constraints: const BoxConstraints(maxHeight: 400, maxWidth: 1200),
       child: Card(
         elevation: 0,
         shape: const RoundedRectangleBorder(
@@ -111,7 +230,7 @@ class _TrendingBarChartState extends State<_TrendingBarChart> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Top Trending ${widget.title}',
