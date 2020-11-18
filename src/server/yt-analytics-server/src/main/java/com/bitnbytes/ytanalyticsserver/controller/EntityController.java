@@ -1,6 +1,7 @@
 package com.bitnbytes.ytanalyticsserver.controller;
 
 import com.bitnbytes.ytanalyticsserver.database.Entity;
+import com.bitnbytes.ytanalyticsserver.database.EntityN;
 import com.bitnbytes.ytanalyticsserver.database.TrendingChartData;
 import com.bitnbytes.ytanalyticsserver.services.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,47 +26,22 @@ public class EntityController {
     }
 
     @RequestMapping(value = "/entities", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getAllData(){
+    public ResponseEntity<List<EntityN>> getAllData(){
         System.out.println("Client requesting all data from server");
         return new ResponseEntity<>(entityService.getAllEntities(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/analytics/trendingdays/{days}", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getAllData(@PathVariable String days){
-        System.out.println("Client trending n days");
-        return new ResponseEntity<>(entityService.getTrendingNDays(days), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/analytics/topTrendingN/{n}", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getTopTrendingN(@PathVariable String n){
-        System.out.println("Client requesting all data from server");
-        return new ResponseEntity<>(entityService.getTopTrendingN(n), HttpStatus.OK);
-    }
-
     @RequestMapping(value = "/entitiesFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getFilteredData(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes){
+    public ResponseEntity<List<EntityN>> getFilteredData(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes){
         System.out.println("Client requesting filtered data from server");
-//        System.out.println(channelName);
-//        System.out.println(category);
-//        System.out.println(commentsDisabled);
-//        System.out.println(videoName);
-//        System.out.println(minViews);
-//        System.out.println(minLikes);
-//        System.out.println(minDislikes);
+        System.out.println(channelName);
+        System.out.println(category);
+        System.out.println(commentsDisabled);
+        System.out.println(videoName);
+        System.out.println(minViews);
+        System.out.println(minLikes);
+        System.out.println(minDislikes);
         return new ResponseEntity<>(entityService.getEntitiesByFilter(channelName, category, commentsDisabled, videoName, minViews, minLikes, minDislikes), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/analyticsFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}/type/{type}", method = RequestMethod.GET)
-    public ResponseEntity<List<TrendingChartData>> getFilteredAnalytics(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes, @PathVariable String type){
-        System.out.println("Client requesting filtered analytics from server");
-//        System.out.println(channelName);
-//        System.out.println(category);
-//        System.out.println(commentsDisabled);
-//        System.out.println(videoName);
-//        System.out.println(minViews);
-//        System.out.println(minLikes);
-//        System.out.println(minDislikes);
-        return new ResponseEntity<>(entityService.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, minViews, minLikes, minDislikes, type), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/backup/{filePath}", method = RequestMethod.POST)
@@ -117,5 +93,28 @@ public class EntityController {
         return new ResponseEntity<>("Restore initiated", HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/analytics/topTrendingN/{n}", method = RequestMethod.GET)
+    public ResponseEntity<List<EntityN>> getTopTrendingN(@PathVariable String n){
+        System.out.println("Client requesting all data from server");
+        return new ResponseEntity<>(entityService.getTopTrendingN(n), HttpStatus.OK);
+    }
 
+    @RequestMapping(value = "/analyticsFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}/type/{type}", method = RequestMethod.GET)
+    public ResponseEntity<List<TrendingChartData>> getFilteredAnalytics(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes, @PathVariable String type){
+        System.out.println("Client requesting filtered analytics from server");
+//        System.out.println(channelName);
+//        System.out.println(category);
+//        System.out.println(commentsDisabled);
+//        System.out.println(videoName);
+//        System.out.println(minViews);
+//        System.out.println(minLikes);
+//        System.out.println(minDislikes);
+        return new ResponseEntity<>(entityService.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, minViews, minLikes, minDislikes, type), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/analytics/trendingdays/{days}", method = RequestMethod.GET)
+    public ResponseEntity<List<Entity>> getAllData(@PathVariable String days){
+        System.out.println("Client trending n days");
+        return new ResponseEntity<>(entityService.getTrendingNDays(days), HttpStatus.OK);
+    }
 }

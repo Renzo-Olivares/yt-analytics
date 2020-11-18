@@ -1,27 +1,27 @@
 package com.bitnbytes.ytanalyticsserver.utils;
 
-import com.bitnbytes.ytanalyticsserver.database.Entity;
+import com.bitnbytes.ytanalyticsserver.database.EntityN;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Optional;
 
 @Component("csvReader")
 public class CsvReader {
-	private ArrayList<Entity> data;
+
+	private Set<EntityN> newData;
 
 	@Autowired
 	public CsvReader() {
-		data = new ArrayList<>();
+		newData = new HashSet<>();
 	}
 
 	public void read(String file) throws IOException {
 		System.out.println("Removing old data");
-		data.clear();
+		newData.clear();
 		System.out.println("Old data removed\nReading in new data");
 		StringBuilder line;
 
@@ -33,18 +33,43 @@ public class CsvReader {
 				line.append(br.readLine());
 			}
 			try {
-				data.add(new Entity(line.toString()));
+				process(line.toString());
 			} catch (Exception e) {
 				i++;
 			}
 
 		}
 		br.close();
-		System.out.println("New data loaded, " + i + " errors, "  + data.size() + " entries.");
+		System.out.println("New data loaded, " + i + " errors, "  + newData.size() + " entries.");
 	}
 
-	public final ArrayList<Entity> getData() {
-		return data;
+	public final Set<EntityN> getDataset() {
+		return newData;
+	}
+
+	private void process(String rawEntity) throws Exception {
+		ArrayList<String> parse = new ArrayList<>();
+		for (String s : rawEntity.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)) {
+			if(s.charAt(0) == ' ') {
+				parse.set(parse.size() - 1, parse.get(parse.size() - 1) + s);
+			}else {
+				parse.add(s);
+			}
+		}
+		initialize(parse);
+	}
+
+	private void initialize(ArrayList<String> rawData) throws Exception {
+		if (rawData.size() != 16) {
+			StringBuilder badData = new StringBuilder();
+			for(String s : rawData) {
+				badData.append(s).append(",");
+			}
+
+			throw new Exception("Bad Format\tSize: " + rawData.size() + "\tData:\t" + badData);
+		}
+
+		newData.add(new EntityN(rawData));
 	}
 
 }

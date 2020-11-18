@@ -10,17 +10,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Component("entityManager")
 public class EntityManager {
+    //deprecated
     private List<Entity> entities = new ArrayList<>();
     private final List<Entity> filteredList = new ArrayList<>();
+    //deprecated
+
     private final CsvReader csvReader;
+
+    private Set<EntityN> entitiesN = new HashSet<>();
+    private Set<EntityN> filteredSet = new HashSet<>();
 
     private void loadData(String filePath) throws IOException{
         this.csvReader.read(filePath);
-        entities.clear();
-        entities.addAll(this.csvReader.getData());
+        entitiesN.clear();
+        entitiesN.addAll(this.csvReader.getDataset());
     }
 
     @Autowired
@@ -29,11 +37,17 @@ public class EntityManager {
         loadData("/home/renzo/USvideos.csv");
     }
 
-    public List<Entity> getAllEntities(){
-        return entities;
+    public List<EntityN> getAllEntities(){
+        return new ArrayList<>(entitiesN);
     }
 
-    public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+
+    //Set functions
+    public List<EntityN> getEntitiesNByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+        return entitiesN.stream().filter(e -> filter(e, channelName, category, commentsDisabled, videoName, views, likes, dislikes)).collect(Collectors.toList());
+    }
+
+    private boolean filter(EntityN entity, String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
         String channelNameParam = channelName.substring(1, channelName.length() - 1);
         String categoryParam = category.substring(1, category.length() - 1);
         String commentsDisabledParam = commentsDisabled.substring(1, commentsDisabled.length() - 1);
@@ -48,23 +62,51 @@ public class EntityManager {
             commentsToggle = true;
         }
 
-        filteredList.clear();
+        return (channelNameParam.equals("") || ((String) entity.get("channelTitle")).toLowerCase().contains(channelNameParam.toLowerCase())) &&
+                (categoryParam.equals("") || entity.get("category").equals(categoryParam)) &&
+                ((boolean) entity.get("commentsDisabled") == commentsToggle) &&
+                (videoNameParam.equals("") || ((String) entity.get("title")).toLowerCase().contains(videoNameParam.toLowerCase())) &&
+                (viewsParam.equals("") || (int) entity.get("views") >= Integer.parseInt(viewsParam)) &&
+                (likesParam.equals("") || (int) entity.get("likes") >= Integer.parseInt(likesParam)) &&
+                (dislikesParam.equals("") || (int) entity.get("dislikes") >= Integer.parseInt(dislikesParam));
+//        return (channelName.equals("") || ((String) entity.get("channelTitle")).toLowerCase().contains(channelName.toLowerCase())) &&
+//                (category.equals("") || entity.get("categoryID").equals(category)) &&
+//                ((boolean) entity.get("commentsDisabled") == commentsToggle) &&
+//                (videoName.equals("") || ((String) entity.get("title")).toLowerCase().contains(videoName.toLowerCase())) &&
+//                (views.equals("") || (int) entity.get("views") >= Integer.parseInt(views)) &&
+//                (likes.equals("") || (int) entity.get("likes") >= Integer.parseInt(likes)) &&
+//                (dislikes.equals("") || (int) entity.get("dislikes") >= Integer.parseInt(dislikes));
+    }
 
-        for (Entity entity : entities) {
-            if((channelNameParam.equals("") || entity.channelTitle.toLowerCase().contains(channelNameParam.toLowerCase())) &&
-                    (categoryParam.equals("") || (entity.getCategory()).equals(categoryParam)) &&
-                    (entity.commentsDisabled == commentsToggle) &&
-                    (videoNameParam.equals("") || entity.title.toLowerCase().contains(videoNameParam.toLowerCase())) &&
-                    (viewsParam.equals("") || entity.views >= Integer.parseInt(viewsParam)) &&
-                    (likesParam.equals("") || entity.likes >= Integer.parseInt(likesParam)) &&
-                    (dislikesParam.equals("") || entity.dislikes >= Integer.parseInt(dislikesParam))){
-                filteredList.add(entity);
-            }
-        }
+    public void removeEntityN(String videoID, String views) {
+        entitiesN.removeIf(entity -> entity.get("videoID").equals(videoID) && (int) entity.get("views") == Integer.parseInt(views));
+    }
 
-        System.out.println(filteredList.size());
+    public void insertEntityN(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description) {
+        System.out.println(entitiesN.size());
+        DateTimeFormatter formatterTrendingDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatterPublishDate = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDate ptrendingDate = LocalDate.parse(trendingDate,formatterTrendingDate);
+        LocalDateTime ppublishTime = LocalDateTime.parse(publishTime,formatterPublishDate);
+        List<String> temp = Arrays.asList(tags.split("\\s*,\\s*"));
+        ArrayList<String> ptags = new ArrayList<>(temp);
 
-        return filteredList;
+        entitiesN.add(new EntityN(videoID,ptrendingDate,title,channelTitle,category,ppublishTime,ptags,Integer.parseInt(views),Integer.parseInt(likes),Integer.parseInt(dislikes),Integer.parseInt(comments),thumbnailLink,commentsDisabled.equals("false"),ratingsDisabled.equals("false"),videoErrorOrRemoved.equals("false"),description));
+        System.out.println(entitiesN.size());
+    }
+
+    public void updateEntityN(String videoID, String oldViews, String views, String likes, String dislikes) {
+        int poldViews = Integer.parseInt(oldViews);
+        int pviews = Integer.parseInt(views);
+        int plikes = Integer.parseInt(likes);
+        int pdislikes = Integer.parseInt(dislikes);
+
+        EntityN updated = entitiesN.stream().filter(e -> e.get("videoID").equals(videoID) && ((int) e.get("views")) == poldViews).collect(Collectors.toList()).get(0);
+        entitiesN.remove(updated);
+        updated.put("views", pviews);
+        updated.put("likes", plikes);
+        updated.put("dislikes", pdislikes);
+        entitiesN.add(updated);
     }
 
     public void backup(String filePath) {
@@ -74,7 +116,7 @@ public class EntityManager {
 
     	ArrayList<String> data = new ArrayList<>();
     	data.add("video_id,trending_date,title,channel_title,category_id,publish_time,tags,views,likes,dislikes,comment_count,thumbnail_link,comments_disabled,ratings_disabled,video_error_or_removed,description");
-    	entities.forEach(e -> data.add(e.getDataCSV()));
+    	entitiesN.forEach(e -> data.add(e.getDataCSV()));
     	
 
 		try {
@@ -99,165 +141,43 @@ public class EntityManager {
         loadData(parsedFilePath);
     }
 
-    public void insertData(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description) {
-        System.out.println(entities.size());
-        String pvideoID = videoID.substring(1, videoID.length() - 1);
-        DateTimeFormatter formatterTrendingDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter formatterPublishDate = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        LocalDate ptrendingDate = LocalDate.parse(trendingDate.substring(1, trendingDate.length()-1),formatterTrendingDate);
-        String ptitle = title.substring(1, title.length() - 1);
-        String pchannelTitle = channelTitle.substring(1, channelTitle.length() - 1);
-        String pcategory = category.substring(1, category.length()-1);
-        LocalDateTime ppublishTime = LocalDateTime.parse(publishTime.substring(1, publishTime.length()-1),formatterPublishDate);
-        String ptagss = tags.substring(1, tags.length() - 1);
-        System.out.println(ptagss);
-        List<String> temp = Arrays.asList(ptagss.split("\\s*,\\s*"));
-        ArrayList<String> ptags = new ArrayList<>(temp);
-        int pviews = Integer.parseInt(views.substring(1,views.length()- 1));
-        int plikes = Integer.parseInt(likes.substring(1, likes.length()-1));
-        int pdislikes = Integer.parseInt(dislikes.substring(1, dislikes.length()-1));
-        int pcommentCount = Integer.parseInt(comments.substring(1, comments.length()-1));
-        String pthumbnailLink = thumbnailLink.substring(1, thumbnailLink.length() - 1);
-        boolean pcommentsDisabled = commentsDisabled.substring(1, commentsDisabled.length() - 1).equals("false");
-        boolean pratingsDisabled = ratingsDisabled.substring(1, ratingsDisabled.length() - 1).equals("false");
-        boolean pvideoErrorOrRemoved = videoErrorOrRemoved.substring(1, videoErrorOrRemoved.length()-1).equals("false");
-        String pdescription = description.substring(1, description.length()-1);
+    //Set Functions
 
-        entities.add(new Entity(pvideoID,ptrendingDate,ptitle,pchannelTitle,pcategory,ppublishTime,ptags,pviews,plikes,pdislikes,pcommentCount,pthumbnailLink,pcommentsDisabled,pratingsDisabled,pvideoErrorOrRemoved,pdescription));
-        System.out.println(entities.size());
+	public List<EntityN> getTopTrendingByLikeDislikeRatio(int n) {
+        List<EntityN> sortedList = getTopTrendingByLikeDislikeRatioHelper(n);
+        if(n > sortedList.size())return sortedList;
+		return sortedList.subList(0, n);
     }
 
-    public void removeEntity(String videoID, String views) {
-        String pvideoID = videoID.substring(1, videoID.length() -1 );
-        int pviews = Integer.parseInt(views.substring(1, views.length() - 1));
-        entities.removeIf(entity -> entity.videoID.equals(pvideoID) && entity.views == pviews);
-    }
+    public List<EntityN> getTopTrendingByLikeDislikeRatioHelper(int n) {
+        // sort list by like/dislike ratio
 
-    public void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes) {
-        String pvideoID = videoID.substring(1, videoID.length() - 1);
-        int poldViews = Integer.parseInt(oldViews.substring(1, oldViews.length() -1));
-        int pviews = Integer.parseInt(views.substring(1, views.length()-1));
-        int plikes = Integer.parseInt(likes.substring(1, likes.length() -1));
-        int pdislikes = Integer.parseInt(dislikes.substring(1, dislikes.length()-1));
-        int entityIdx = 0;
-        Entity replace = null;
+        Map<String, Double> topTrending = new HashMap<>();
 
-        for(Entity entity: entities){
-            if(entity.videoID.equals(pvideoID) && entity.views == poldViews){
-                entityIdx = entities.indexOf(entity);
-                replace = new Entity(entity);
-                replace.views = pviews;
-                replace.likes = plikes;
-                replace.dislikes = pdislikes;
+        for(EntityN entity : entitiesN){
+            try{
+                topTrending.put((String) entity.get("videoID"), (double) ((int) entity.get("likes") / (int) entity.get("dislikes")));
+            }catch (ArithmeticException e){
+                topTrending.put((String) entity.get("videoID"), 0.0);
             }
         }
 
-        entities.set(entityIdx, replace);
-    }
+        PriorityQueue<Map.Entry<String,Double>> topN = topN(topTrending, n);
 
-    public List<Entity> getTopTrendingByViews(int n) {
-        List<Entity> sortedList = getTopTrendingByViews(this.entities);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
-    }
-    
-    public List<Entity> getTopTrendingByViews() {
-		return getTopTrendingByViews(this.entities);
-    }
-	
-	public List<Entity> getTopTrendingByViews(int n, List<Entity> entities) {
-        List<Entity> sortedList = getTopTrendingByViews(entities);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
-	}
+        System.out.println(topN.size());
+        List<EntityN> realData = new ArrayList<>();
 
-	public List<Entity> getTopTrendingByViews(List<Entity> entities) {
-		// sort list by views
-        List<Entity> sortedList = new ArrayList<Entity>(entities);
-//		for(int j = 0; j < sortedList.size(); j++) {
-//			int k = j;
-//			for (int i = j + 1; i < sortedList.size(); i++) {
-//				if(sortedList.get(k).getViews() < sortedList.get(i).getViews()) {
-//					k = i;
-//				}
-//			}
-//			Collections.swap(sortedList, j, k);
-//		}
-		sortedList.sort((Entity e1, Entity e2)->e2.getViews()-e1.getViews()); 
-		return sortedList;
-	}
+        while(topN.size() > 0){
+            Map.Entry<String, Double> single = topN.poll();
+            realData.add(entitiesN.stream().filter(e -> ((String) e.get("videoID")).contains(single.getKey())).findFirst().get());
+        }
 
-	public List<Entity> getTopTrendingByLikes(int n) {
-        List<Entity> sortedList = getTopTrendingByLikes(this.entities);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
-    }
-    
-    public List<Entity> getTopTrendingByLikes() {
-		return getTopTrendingByLikes(this.entities);
-    }
-	
-	public List<Entity> getTopTrendingByLikes(int n, List<Entity> entities) {
-        List<Entity> sortedList = getTopTrendingByLikes(entities);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
-	}
 
-	public List<Entity> getTopTrendingByLikes(List<Entity> entities) {
-		// sort list by number of likes
-        List<Entity> sortedList = new ArrayList<Entity>(entities);
-//		for(int j = 0; j < sortedList.size(); j++) {
-//			int k = j;
-//			for (int i = j + 1; i < sortedList.size(); i++) {
-//				if(sortedList.get(k).getLikes() < sortedList.get(i).getLikes()) {
-//					k = i;
-//				}
-//			}
-//			Collections.swap(sortedList, j, k);
-//		}
-		sortedList.sort((Entity e1, Entity e2)->e2.getLikes()-e1.getLikes()); 
-		return sortedList;
-
-	}
-
-	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
-        List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(this.entities);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
-    }
-    
-    public List<Entity> getTopTrendingByLikeDislikeRatio() {
-		return getTopTrendingByLikeDislikeRatio(this.entities);
-    }
-	
-	public List<Entity> getTopTrendingByLikeDislikeRatio(int n, List<Entity> entities) {
-        List<Entity> sortedList = getTopTrendingByLikeDislikeRatio(entities);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
-	}
-
-	public List<Entity> getTopTrendingByLikeDislikeRatio(List<Entity> entities) {
-		// sort list by like/dislike ratio
-        List<Entity> sortedList = new ArrayList<Entity>(entities);
-		for(int j = 0; j < sortedList.size(); j++) {
-			int k = j;
-			for (int i = j + 1; i < sortedList.size(); i++) {
-				if(sortedList.get(k).LikeDislikeRatio() < sortedList.get(i).LikeDislikeRatio()) {
-					k = i;
-				}else if(sortedList.get(k).LikeDislikeRatio() == sortedList.get(i).LikeDislikeRatio()) {
-					if(sortedList.get(k).getLikes() < sortedList.get(i).getLikes()) {
-						k = i;
-					}
-				}
-			}
-			Collections.swap(sortedList, j, k);
-		}
-		return sortedList;
-
+        return realData;
     }
 
     public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
-        loadFilteredList(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+        loadFilteredSet(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
         if(type.equals("Categories")){
             return getTopTrendingCategories();
         }else if(type.equals("Channels")){
@@ -267,128 +187,53 @@ public class EntityManager {
         }
     }
 
-    void loadFilteredList(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
-        String channelNameParam = channelName.substring(1, channelName.length() - 1);
-        String categoryParam = category.substring(1, category.length() - 1);
-        String commentsDisabledParam = commentsDisabled.substring(1, commentsDisabled.length() - 1);
-        String videoNameParam = videoName.substring(1, videoName.length() - 1);
-        String viewsParam = views.substring(1, views.length() - 1);
-        String likesParam = likes.substring(1, likes.length() - 1);
-        String dislikesParam = dislikes.substring(1, dislikes.length() - 1);
-
-        boolean commentsToggle = false;
-
-        if(commentsDisabledParam.equals("true")){
-            commentsToggle = true;
-        }
-
-        filteredList.clear();
-
-        for (Entity entity : entities) {
-            if((channelNameParam.equals("") || entity.channelTitle.toLowerCase().contains(channelNameParam.toLowerCase())) &&
-                    (categoryParam.equals("") || (entity.getCategory()).equals(categoryParam)) &&
-                    (entity.commentsDisabled == commentsToggle) &&
-                    (videoNameParam.equals("") || entity.title.toLowerCase().contains(videoNameParam.toLowerCase())) &&
-                    (viewsParam.equals("") || entity.views >= Integer.parseInt(viewsParam)) &&
-                    (likesParam.equals("") || entity.likes >= Integer.parseInt(likesParam)) &&
-                    (dislikesParam.equals("") || entity.dislikes >= Integer.parseInt(dislikesParam))){
-                filteredList.add(entity);
-            }
-        }
+    void loadFilteredSet(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+        filteredSet = entitiesN.stream().filter(e -> filter(e, channelName, category, commentsDisabled, videoName, views, likes, dislikes)).collect(Collectors.toSet());
     }
 
     public List<TrendingChartData> getTopTrendingChannels() {
         Map<String, Integer> topChannels = new HashMap<>();
-        for(Entity entity : filteredList){
-            topChannels.put(entity.getChannelTitle(), 0);
+
+        for(EntityN entity : filteredSet){
+            topChannels.put((String) entity.get("channelTitle"), 0);
         }
 
-        for(Entity entity : filteredList){
-            topChannels.put(entity.getChannelTitle(), topChannels.get(entity.getChannelTitle()) + 1);
-        }
-        List<TrendingChartData> realData = new ArrayList<TrendingChartData>();
-
-        int max1 = 0;
-        String max1Channel = "";
-
-        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
-            if(pair.getValue() > max1){
-                max1 = pair.getValue();
-                max1Channel = pair.getKey();
-            }
+        for(EntityN entity : filteredSet){
+            topChannels.put((String) entity.get("channelTitle"), topChannels.get(entity.get("channelTitle")) + 1);
         }
 
-        realData.add(new TrendingChartData(max1Channel, max1));
-        topChannels.remove(max1Channel, max1);
+        return getTrendingChartData(topChannels);
+    }
 
-        int max2 = 0;
-        String max2Channel = "";
+    private List<TrendingChartData> getTrendingChartData(Map<String, Integer> topChannels) {
+        PriorityQueue<Map.Entry<String,Integer>> topN = topN(topChannels, 6);
+        List<TrendingChartData> realData = new ArrayList<>();
 
-        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
-            if(pair.getValue() > max2){
-                max2 = pair.getValue();
-                max2Channel = pair.getKey();
-            }
+        while(topN.size() > 0){
+            Map.Entry<String, Integer> single = topN.poll();
+            realData.add(new TrendingChartData(single.getKey(), single.getValue()));
         }
-
-        realData.add(new TrendingChartData(max2Channel, max2));
-
-        topChannels.remove(max2Channel, max2);
-
-        int max3 = 0;
-        String max3Channel = "";
-
-        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
-            if(pair.getValue() > max3){
-                max3 = pair.getValue();
-                max3Channel = pair.getKey();
-            }
-        }
-
-        realData.add(new TrendingChartData(max3Channel, max3));
-        topChannels.remove(max3Channel, max3);
-
-        int max4 = 0;
-        String max4Channel = "";
-
-        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
-            if(pair.getValue() > max4){
-                max4 = pair.getValue();
-                max4Channel = pair.getKey();
-            }
-        }
-
-        realData.add(new TrendingChartData(max4Channel, max4));
-        topChannels.remove(max4Channel, max4);
-
-        int max5 = 0;
-        String max5Channel = "";
-
-        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
-            if(pair.getValue() > max5){
-                max5 = pair.getValue();
-                max5Channel = pair.getKey();
-            }
-        }
-        realData.add(new TrendingChartData(max5Channel, max5));
-        topChannels.remove(max5Channel, max5);
-
-        int max6 = 0;
-        String max6Channel = "";
-
-        for(Map.Entry<String, Integer> pair : topChannels.entrySet()){
-            if(pair.getValue() > max6){
-                max6 = pair.getValue();
-                max6Channel = pair.getKey();
-            }
-        }
-        realData.add(new TrendingChartData(max6Channel, max6));
-
-        topChannels.remove(max6Channel, max6);
-
-
 
         return realData;
+    }
+
+    private <K, V extends Comparable<? super V>> PriorityQueue<Map.Entry<K,V>> topN(Map<K, V> map, int n){
+        Comparator<? super Map.Entry<K,V>> comparator = (Comparator<Map.Entry<K, V>>) (t0, t1) -> {
+            V a0 = t0.getValue();
+            V a1 = t1.getValue();
+            return a0.compareTo(a1);
+        };
+
+        PriorityQueue<Map.Entry<K,V>> top = new PriorityQueue<>(n, comparator);
+
+        for (Map.Entry<K,V> entry : map.entrySet()){
+            top.offer(entry);
+            while(top.size() > n){
+                top.poll();
+            }
+        }
+
+        return top;
     }
 
     public List<TrendingChartData> getTopTrendingCategories() {
@@ -465,102 +310,11 @@ public class EntityManager {
 
             }
 
-        for(Entity entity : filteredList){
-            topCategories.put(entity.getCategory(), topCategories.get(entity.getCategory()) + 1);
+        for(EntityN entity : filteredSet){
+            topCategories.put((String) entity.get("category"), topCategories.get(entity.get("category")) + 1);
         }
 
-        List<TrendingChartData> realData = new ArrayList<TrendingChartData>();
-
-        int max1 = 0;
-        String max1Cat = "";
-
-        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
-            if(pair.getValue() > max1){
-                max1 = pair.getValue();
-                max1Cat = pair.getKey();
-            }
-        }
-
-        realData.add(new TrendingChartData(max1Cat, max1));
-        topCategories.remove(max1Cat, max1);
-
-        int max2 = 0;
-        String max2Cat = "";
-
-        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
-            if(pair.getValue() > max2){
-                max2 = pair.getValue();
-                max2Cat = pair.getKey();
-            }
-        }
-
-        realData.add(new TrendingChartData(max2Cat, max2));
-
-        topCategories.remove(max2Cat, max2);
-
-        int max3 = 0;
-        String max3Cat = "";
-
-        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
-            if(pair.getValue() > max3){
-                max3 = pair.getValue();
-                max3Cat = pair.getKey();
-            }
-        }
-
-        realData.add(new TrendingChartData(max3Cat, max3));
-        topCategories.remove(max3Cat, max3);
-
-        int max4 = 0;
-        String max4Cat = "";
-
-        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
-            if(pair.getValue() > max4){
-                max4 = pair.getValue();
-                max4Cat = pair.getKey();
-            }
-        }
-
-        realData.add(new TrendingChartData(max4Cat, max4));
-        topCategories.remove(max4Cat, max4);
-
-        int max5 = 0;
-        String max5Cat = "";
-
-        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
-            if(pair.getValue() > max5){
-                max5 = pair.getValue();
-                max5Cat = pair.getKey();
-            }
-        }
-        realData.add(new TrendingChartData(max5Cat, max5));
-        topCategories.remove(max5Cat, max5);
-
-        int max6 = 0;
-        String max6Cat = "";
-
-        for(Map.Entry<String, Integer> pair : topCategories.entrySet()){
-            if(pair.getValue() > max6){
-                max6 = pair.getValue();
-                max6Cat = pair.getKey();
-            }
-        }
-        realData.add(new TrendingChartData(max6Cat, max6));
-
-        topCategories.remove(max6Cat, max6);
-
-
-
-        return realData;
-
-//        List<TrendingChartData> mockData = new ArrayList<TrendingChartData>();
-//        mockData.add(new TrendingChartData("PewDiePie", 200));
-//        mockData.add(new TrendingChartData("JerryRigEverything", 400));
-//        mockData.add(new TrendingChartData("CNN", 400));
-//        mockData.add(new TrendingChartData("KSI", 500));
-//        mockData.add(new TrendingChartData("Logan Paul", 700));
-//        mockData.add(new TrendingChartData("MKBHD", 1000));
-//        return mockData;
+        return getTrendingChartData(topCategories);
     }
 
     public List<TrendingChartData> getTagAverageCategory(){
@@ -602,22 +356,6 @@ public class EntityManager {
         return chart.subList(0,6);
     }
 
-    public int getTagAverage(List<Entity> list) {
-        int sum = 0;
-        for(Entity e : list) {
-            sum += e.tags.size();
-        }
-        return sum/list.size();
-    }
-
-    public int getTagAverage() {
-        return getTagAverage(this.entities);
-    }
-
-    public List<List<Entity>> getCompressDuplicatedVideos(){
-        return this.getCompressDuplicatedVideos(this.entities);
-    }
-
     public List<List<Entity>> getCompressDuplicatedVideos(List<Entity> list){
         List<List<Entity>> mappedVideos = new ArrayList<>();
         for(Entity e : list) {
@@ -656,19 +394,4 @@ public class EntityManager {
         }
         return list;
     }
-
-    public int getDaysTrending(String VideoID) {
-        int daysTrending = 0;
-        for(Entity e : this.entities) {
-            if(e.getVideoID().equals(VideoID)) {
-                ++daysTrending;
-            }
-        }
-        return daysTrending;
-    }
-
-    public int getDaysTrending(Entity video) {
-        return getDaysTrending(video.getVideoID());
-    }
-
 }

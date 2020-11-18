@@ -82,9 +82,9 @@ class EntityManager with ChangeNotifier {
       category: category,
       commentsDisabled: commentsDisabled,
       videoName: videoName,
-      views: views,
-      likes: likes,
-      dislikes: dislikes,
+      minViews: views,
+      minLikes: likes,
+      minDislikes: dislikes,
       channelName: channelName,
     );
 
@@ -134,16 +134,16 @@ class EntityManager with ChangeNotifier {
       type: 'Categories',
     );
 
-    _avgTagsCategories = api.getFilteredAnalytics(
-      category: category,
-      commentsDisabled: commentsDisabled,
-      videoName: videoName,
-      views: views,
-      likes: likes,
-      dislikes: dislikes,
-      channelName: channelName,
-      type: 'Tags',
-    );
+    // _avgTagsCategories = api.getFilteredAnalytics(
+    //   category: category,
+    //   commentsDisabled: commentsDisabled,
+    //   videoName: videoName,
+    //   views: views,
+    //   likes: likes,
+    //   dislikes: dislikes,
+    //   channelName: channelName,
+    //   type: 'Tags',
+    // );
 
     notifyListeners();
   }

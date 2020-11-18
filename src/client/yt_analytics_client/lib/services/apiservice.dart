@@ -84,9 +84,9 @@ class ApiService {
     String category = '',
     String commentsDisabled = '',
     String videoName = '',
-    String views = '',
-    String likes = '',
-    String dislikes = '',
+    String minViews = '',
+    String minLikes = '',
+    String minDislikes = '',
     String channelName = '',
   }) async {
     print('fetching filtered data');
@@ -98,9 +98,9 @@ class ApiService {
       'category/{$category}/'
       'commentsDisabled/{$commentsDisabled}/'
       'videoName/{$videoName}/'
-      'views/{$views}/'
-      'likes/{$likes}/'
-      'dislikes/{$dislikes}',
+      'views/{$minViews}/'
+      'likes/{$minLikes}/'
+      'dislikes/{$minDislikes}',
     );
 
     final response = await http.get(uri);
@@ -110,6 +110,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       print('response for filtered data request is okay');
+      print(jsonDecode(response.body));
       final responseJson = jsonDecode(response.body) as List<dynamic>;
 
       for (var response in responseJson) {
@@ -175,22 +176,22 @@ class ApiService {
     final uri = Uri.http(
       apiUrl,
       'ytanalytics/insert/'
-      'videoID/{${entity.videoID}}/'
-      'trendingDate/{${entity.trendingDate}}/'
-      'title/{"${entity.title}"}/'
-      'channelTitle/{"${entity.channelTitle}"}/'
-      'category/{${entity.category}}/'
-      'publishTime/{${entity.publishTime}}/'
-      'tags/{${entity.tags}}/'
-      'views/{${entity.views.toString()}}/'
-      'likes/{${entity.likes.toString()}}/'
-      'dislikes/{${entity.dislikes.toString()}}/'
-      'comments/{${entity.commentCount.toString()}}/'
-      'thumbnailLink/{${entity.thumbnailLink}}/'
-      'commentsDisabled/{${entity.commentsDisabled.toString()}}/'
-      'ratingsDisabled/{${entity.ratingsDisabled.toString()}}/'
-      'videoErrorOrRemoved/{${entity.videoErrorOrRemoved.toString()}}/'
-      'description/{"${entity.description}"}',
+      'videoID/${entity.videoID}/'
+      'trendingDate/${entity.trendingDate}/'
+      'title/"${entity.title}"/'
+      'channelTitle/"${entity.channelTitle}"/'
+      'category/${entity.category}/'
+      'publishTime/${entity.publishTime}/'
+      'tags/${entity.tags}/'
+      'views/${entity.views.toString()}/'
+      'likes/${entity.likes.toString()}/'
+      'dislikes/${entity.dislikes.toString()}/'
+      'comments/${entity.commentCount.toString()}/'
+      'thumbnailLink/${entity.thumbnailLink}/'
+      'commentsDisabled/${entity.commentsDisabled.toString()}/'
+      'ratingsDisabled/${entity.ratingsDisabled.toString()}/'
+      'videoErrorOrRemoved/${entity.videoErrorOrRemoved.toString()}/'
+      'description/"${entity.description}"',
     );
 
     final response = await http.post(uri);
@@ -208,8 +209,8 @@ class ApiService {
     final uri = Uri.http(
       apiUrl,
       'ytanalytics/remove/'
-      'videoID/{$videoID}/'
-      'views/{$views}',
+      'videoID/$videoID/'
+      'views/$views',
     );
 
     final response = await http.post(uri);
@@ -233,11 +234,11 @@ class ApiService {
     final uri = Uri.http(
       apiUrl,
       'ytanalytics/'
-      'update/{$videoID}/'
-      'oldViews/{$oldViews}/'
-      'views/{$views}/'
-      'likes/{$likes}/'
-      'dislikes/{$dislikes}',
+      'update/$videoID/'
+      'oldViews/$oldViews/'
+      'views/$views/'
+      'likes/$likes/'
+      'dislikes/$dislikes',
     );
 
     final response = await http.post(uri);
