@@ -156,7 +156,7 @@ public class EntityManager {
 
         for(EntityN entity : entitiesN){
             try{
-                topTrending.put((String) entity.get("videoID"), (double) ((int) entity.get("likes") / (int) entity.get("dislikes")));
+                topTrending.put((String) entity.get("videoID"), (double) ((int) entity.get("likes") / ((int) entity.get("likes") + (int) entity.get("dislikes"))));
             }catch (ArithmeticException e){
                 topTrending.put((String) entity.get("videoID"), 0.0);
             }
