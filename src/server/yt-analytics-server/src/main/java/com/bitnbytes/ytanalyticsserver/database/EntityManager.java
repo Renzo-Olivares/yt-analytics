@@ -171,7 +171,12 @@ public class EntityManager {
     }
 
     public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
-        loadFilteredSet(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+        if(type.equals("Tags") && tagAverageStore == null){
+            loadFilteredSet(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+        }else if(!type.equals("Tags")){
+            loadFilteredSet(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+        }
+
         if(type.equals("Categories")){
             return getTopTrendingCategories();
         }else if(type.equals("Channels")){
