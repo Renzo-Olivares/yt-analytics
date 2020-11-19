@@ -1,6 +1,6 @@
 package com.bitnbytes.ytanalyticsserver.utils;
 
-import com.bitnbytes.ytanalyticsserver.database.EntityN;
+import com.bitnbytes.ytanalyticsserver.database.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ import java.io.IOException;
 @Component("csvReader")
 public class CsvReader {
 
-	private Set<EntityN> newData;
+	private Set<Entity> newData;
 
 	@Autowired
 	public CsvReader() {
@@ -43,7 +43,7 @@ public class CsvReader {
 		System.out.println("New data loaded, " + i + " errors, "  + newData.size() + " entries.");
 	}
 
-	public final Set<EntityN> getDataset() {
+	public final Set<Entity> getDataset() {
 		return newData;
 	}
 
@@ -69,7 +69,7 @@ public class CsvReader {
 			throw new Exception("Bad Format\tSize: " + rawData.size() + "\tData:\t" + badData);
 		}
 
-		newData.add(new EntityN(rawData));
+		newData.add(new Entity(rawData));
 	}
 
 }

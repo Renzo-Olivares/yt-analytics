@@ -1,8 +1,7 @@
 package com.bitnbytes.ytanalyticsserver.services;
 
-import com.bitnbytes.ytanalyticsserver.database.Entity;
 import com.bitnbytes.ytanalyticsserver.database.EntityManager;
-import com.bitnbytes.ytanalyticsserver.database.EntityN;
+import com.bitnbytes.ytanalyticsserver.database.Entity;
 import com.bitnbytes.ytanalyticsserver.database.TrendingChartData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,13 +20,13 @@ public class EntityServiceImpl implements EntityService{
     }
 
     @Override
-    public List<EntityN> getAllEntities() {
+    public List<Entity> getAllEntities() {
         return entityDatabase.getAllEntities();
     }
 
     @Override
-    public List<EntityN> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes) {
-        return entityDatabase.getEntitiesNByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
+    public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes) {
+        return entityDatabase.getEntitiesByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
     }
 
     @Override
@@ -42,7 +41,7 @@ public class EntityServiceImpl implements EntityService{
 
     @Override
     public void insertData(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description) {
-        entityDatabase.insertEntityN(videoID,trendingDate,title,channelTitle,category,publishTime,tags,views,likes,dislikes,comments,thumbnailLink,commentsDisabled,ratingsDisabled,videoErrorOrRemoved,description);
+        entityDatabase.insertEntity(videoID,trendingDate,title,channelTitle,category,publishTime,tags,views,likes,dislikes,comments,thumbnailLink,commentsDisabled,ratingsDisabled,videoErrorOrRemoved,description);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class EntityServiceImpl implements EntityService{
     @Override
     public void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes) {
         System.out.println(videoID);
-        entityDatabase.updateEntityN(videoID, oldViews, views, likes, dislikes);
+        entityDatabase.updateEntity(videoID, oldViews, views, likes, dislikes);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class EntityServiceImpl implements EntityService{
     }
 
     @Override
-    public List<EntityN> getTopTrendingN(String n) {
+    public List<Entity> getTopTrendingN(String n) {
         return entityDatabase.getTopTrendingByLikeDislikeRatio(Integer.parseInt(n));
     }
 

@@ -10,20 +10,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Component("entityManager")
 public class EntityManager {
-    //deprecated
-    private List<Entity> entities = new ArrayList<>();
-    private final List<Entity> filteredList = new ArrayList<>();
-    //deprecated
-
     private final CsvReader csvReader;
 
-    private Set<EntityN> entitiesN = new HashSet<>();
-    private Set<EntityN> filteredSet = new HashSet<>();
+    private Set<Entity> entitiesN = new HashSet<>();
+    private Set<Entity> filteredSet = new HashSet<>();
 
     private void loadData(String filePath) throws IOException{
         this.csvReader.read(filePath);
@@ -37,17 +31,16 @@ public class EntityManager {
         loadData("/home/renzo/USvideos.csv");
     }
 
-    public List<EntityN> getAllEntities(){
+    public List<Entity> getAllEntities(){
         return new ArrayList<>(entitiesN);
     }
 
 
-    //Set functions
-    public List<EntityN> getEntitiesNByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+    public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
         return entitiesN.stream().filter(e -> filter(e, channelName, category, commentsDisabled, videoName, views, likes, dislikes)).collect(Collectors.toList());
     }
 
-    private boolean filter(EntityN entity, String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+    private boolean filter(Entity entity, String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
         String channelNameParam = channelName.substring(1, channelName.length() - 1);
         String categoryParam = category.substring(1, category.length() - 1);
         String commentsDisabledParam = commentsDisabled.substring(1, commentsDisabled.length() - 1);
@@ -82,7 +75,7 @@ public class EntityManager {
         entitiesN.removeIf(entity -> entity.get("videoID").equals(videoID) && (int) entity.get("views") == Integer.parseInt(views));
     }
 
-    public void insertEntityN(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description) {
+    public void insertEntity(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description) {
         System.out.println(entitiesN.size());
         DateTimeFormatter formatterTrendingDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter formatterPublishDate = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -91,17 +84,17 @@ public class EntityManager {
         List<String> temp = Arrays.asList(tags.split("\\s*,\\s*"));
         ArrayList<String> ptags = new ArrayList<>(temp);
 
-        entitiesN.add(new EntityN(videoID,ptrendingDate,title,channelTitle,category,ppublishTime,ptags,Integer.parseInt(views),Integer.parseInt(likes),Integer.parseInt(dislikes),Integer.parseInt(comments),thumbnailLink,commentsDisabled.equals("false"),ratingsDisabled.equals("false"),videoErrorOrRemoved.equals("false"),description));
+        entitiesN.add(new Entity(videoID,ptrendingDate,title,channelTitle,category,ppublishTime,ptags,Integer.parseInt(views),Integer.parseInt(likes),Integer.parseInt(dislikes),Integer.parseInt(comments),thumbnailLink,commentsDisabled.equals("false"),ratingsDisabled.equals("false"),videoErrorOrRemoved.equals("false"),description));
         System.out.println(entitiesN.size());
     }
 
-    public void updateEntityN(String videoID, String oldViews, String views, String likes, String dislikes) {
+    public void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes) {
         int poldViews = Integer.parseInt(oldViews);
         int pviews = Integer.parseInt(views);
         int plikes = Integer.parseInt(likes);
         int pdislikes = Integer.parseInt(dislikes);
 
-        EntityN updated = entitiesN.stream().filter(e -> e.get("videoID").equals(videoID) && ((int) e.get("views")) == poldViews).collect(Collectors.toList()).get(0);
+        Entity updated = entitiesN.stream().filter(e -> e.get("videoID").equals(videoID) && ((int) e.get("views")) == poldViews).collect(Collectors.toList()).get(0);
         entitiesN.remove(updated);
         updated.put("views", pviews);
         updated.put("likes", plikes);
@@ -141,20 +134,16 @@ public class EntityManager {
         loadData(parsedFilePath);
     }
 
-    //Set Functions
-
-	public List<EntityN> getTopTrendingByLikeDislikeRatio(int n) {
-        List<EntityN> sortedList = getTopTrendingByLikeDislikeRatioHelper(n);
+	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
+        List<Entity> sortedList = getTopTrendingByLikeDislikeRatioHelper(n);
         if(n > sortedList.size())return sortedList;
 		return sortedList.subList(0, n);
     }
 
-    public List<EntityN> getTopTrendingByLikeDislikeRatioHelper(int n) {
-        // sort list by like/dislike ratio
-
+    public List<Entity> getTopTrendingByLikeDislikeRatioHelper(int n) {
         Map<String, Double> topTrending = new HashMap<>();
 
-        for(EntityN entity : entitiesN){
+        for(Entity entity : entitiesN){
             try{
                 topTrending.put((String) entity.get("videoID"), (double) ((int) entity.get("likes") / ((int) entity.get("likes") + (int) entity.get("dislikes"))));
             }catch (ArithmeticException e){
@@ -165,7 +154,7 @@ public class EntityManager {
         PriorityQueue<Map.Entry<String,Double>> topN = topN(topTrending, n);
 
         System.out.println(topN.size());
-        List<EntityN> realData = new ArrayList<>();
+        List<Entity> realData = new ArrayList<>();
 
         while(topN.size() > 0){
             Map.Entry<String, Double> single = topN.poll();
@@ -194,11 +183,11 @@ public class EntityManager {
     public List<TrendingChartData> getTopTrendingChannels() {
         Map<String, Integer> topChannels = new HashMap<>();
 
-        for(EntityN entity : filteredSet){
+        for(Entity entity : filteredSet){
             topChannels.put((String) entity.get("channelTitle"), 0);
         }
 
-        for(EntityN entity : filteredSet){
+        for(Entity entity : filteredSet){
             topChannels.put((String) entity.get("channelTitle"), topChannels.get(entity.get("channelTitle")) + 1);
         }
 
@@ -310,33 +299,55 @@ public class EntityManager {
 
             }
 
-        for(EntityN entity : filteredSet){
+        for(Entity entity : filteredSet){
             topCategories.put((String) entity.get("category"), topCategories.get(entity.get("category")) + 1);
         }
 
         return getTrendingChartData(topCategories);
     }
 
+    public List<Entity> getTrendingNDays(int n){
+        Map<String, Integer> topVideos = new HashMap<>();
+
+        for(Entity entity : entitiesN){
+            if(topVideos.containsKey(entity.get("videoID"))){
+                topVideos.put((String) entity.get("videoID"), topVideos.get(entity.get("videoID")) + 1);
+            }else{
+                topVideos.put((String) entity.get("videoID"), 0);
+            }
+        }
+
+        List<Entity> realData = new ArrayList<>();
+        for(Map.Entry<String,Integer> compressedEntity: topVideos.entrySet()){
+            if(compressedEntity.getValue() == n){
+                realData.add(entitiesN.stream().filter(e -> e.get("videoID").equals(compressedEntity.getKey())).findFirst().get());
+            }
+        }
+
+        return realData;
+    }
+
+    //Needs update
     public List<TrendingChartData> getTagAverageCategory(){
         List<TrendingChartData> chart = new ArrayList<>(), numVideos = new ArrayList<>();
 
-        for(Entity e : this.filteredList) {
+        for(Entity e : this.filteredSet) {
             boolean found = false;
             for(TrendingChartData t : chart) {
-                if(t.getxVal().equals(e.getCategory())) {
-                    t.setyVal(t.getyVal() + e.getTags().size());
+                if(t.getxVal().equals(e.get("category"))) {
+                    t.setyVal(t.getyVal() + ((ArrayList<String>) e.get("tags")).size());
                     found = true;
                     break;
                 }
             }
             if(!found) {
-                TrendingChartData t = new TrendingChartData(e.getCategory(), e.getTags().size());
-                TrendingChartData n = new TrendingChartData(e.getCategory(), 1);
+                TrendingChartData t = new TrendingChartData((String) e.get("category"), ((ArrayList<String>)e.get("tags")).size());
+                TrendingChartData n = new TrendingChartData((String) e.get("category"), 1);
                 chart.add(t);
                 numVideos.add(n);
             }else {
                 for(TrendingChartData t : numVideos) {
-                    if(t.getxVal().equals(e.getCategory())) {
+                    if(t.getxVal().equals(e.get("category"))) {
                         t.setyVal(t.getyVal() + 1);
                         break;
                     }
@@ -355,43 +366,5 @@ public class EntityManager {
         chart.sort((TrendingChartData t1, TrendingChartData t2)->t2.getyVal()-t1.getyVal());
         return chart.subList(0,6);
     }
-
-    public List<List<Entity>> getCompressDuplicatedVideos(List<Entity> list){
-        List<List<Entity>> mappedVideos = new ArrayList<>();
-        for(Entity e : list) {
-            boolean found = false;
-            for(List<Entity> l : mappedVideos) {
-                if(l.get(0).getVideoID().equals(e.getVideoID())) {
-                    l.add(e);
-                    found = true;
-                    break;
-                }
-            }
-            if(!found) {
-                List<Entity> newVal = new ArrayList<>();
-                newVal.add(e);
-                mappedVideos.add(newVal);
-            }
-        }
-        return mappedVideos;
-    }
-
-    public List<Entity> getTrendingNDays(int n){
-        return getTrendingNDaysUnCompressedArg(this.entities, n);
-    }
-
-    public List<Entity> getTrendingNDaysUnCompressedArg(List<Entity> list, int n){
-        return getTrendingNDaysCompressedArg(getCompressDuplicatedVideos(list), n);
-    }
-
-    public List<Entity> getTrendingNDaysCompressedArg(List<List<Entity>> compressedList, int n){//returns only the first video.
-        List<Entity> list = new ArrayList<>();
-        if(n < 1)return list;
-        for(List<Entity> l : compressedList) {
-            if(l.size() == n) {
-                list.add(l.get(0));
-            }
-        }
-        return list;
-    }
+    //Needs update
 }
