@@ -28,6 +28,7 @@ public class EntityManager {
     @Autowired
     public EntityManager(CsvReader csvReader) throws IOException {
         this.csvReader = csvReader;
+        this.tagAverageStore = null;
         loadData("/home/renzo/USvideos.csv");
     }
 
@@ -110,7 +111,7 @@ public class EntityManager {
     	ArrayList<String> data = new ArrayList<>();
     	data.add("video_id,trending_date,title,channel_title,category_id,publish_time,tags,views,likes,dislikes,comment_count,thumbnail_link,comments_disabled,ratings_disabled,video_error_or_removed,description");
     	entitiesN.forEach(e -> data.add(e.getDataCSV()));
-    	
+
 
 		try {
 			FileWriter writer = new FileWriter(filePathParsed);
@@ -327,44 +328,58 @@ public class EntityManager {
         return realData;
     }
 
+    private List<TagAverageStore> tagAverageStore;
+
+
     //Needs update
-    public List<TrendingChartData> getTagAverageCategory(){
-        List<TrendingChartData> chart = new ArrayList<>(), numVideos = new ArrayList<>();
-
-        for(Entity e : this.filteredSet) {
-            boolean found = false;
-            for(TrendingChartData t : chart) {
-                if(t.getxVal().equals(e.get("category"))) {
-                    t.setyVal(t.getyVal() + ((ArrayList<String>) e.get("tags")).size());
-                    found = true;
-                    break;
-                }
+    public List<TrendingChartData> getTagAverageCategory() {
+        List<TrendingChartData> chart = new ArrayList<>();
+        if (tagAverageStore == null) {
+            tagAverageStore = new ArrayList<TagAverageStore>();
+            int categoryID, tags;
+            for (int i = 0; i < 45; i++) {
+                tagAverageStore.add(new TagAverageStore(0, 0, i));
             }
-            if(!found) {
-                TrendingChartData t = new TrendingChartData((String) e.get("category"), ((ArrayList<String>)e.get("tags")).size());
-                TrendingChartData n = new TrendingChartData((String) e.get("category"), 1);
-                chart.add(t);
-                numVideos.add(n);
-            }else {
-                for(TrendingChartData t : numVideos) {
-                    if(t.getxVal().equals(e.get("category"))) {
-                        t.setyVal(t.getyVal() + 1);
-                        break;
-                    }
-                }
+            for (Entity e : this.filteredSet) {
+                categoryID = TagAverageStore.getCategory((String)e.get("category"));
+                tags = ((ArrayList<String>) e.get("tags")).size();
+                tagAverageStore.get(categoryID).incrementVideoCount();
+                tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
             }
         }
-        for(TrendingChartData t : chart) {
-            for(TrendingChartData n : numVideos) {
-                if(t.getxVal().equals(n.getxVal())) {
-                    t.setyVal(t.getyVal()/n.getyVal());
-                    break;
-                }
-            }
+        tagAverageStore.forEach(tas -> chart.add(new TrendingChartData(tas.getCategory(), tas.getTagAverage())));
+        chart.sort((TrendingChartData t1, TrendingChartData t2) -> t2.getyVal() - t1.getyVal());
+        return chart.subList(0, 6);
+    }
 
+    private void updateTagAverageCategory(Entity insert, Entity remove) {
+        if ((insert == null && remove == null) || this.tagAverageStore == null) {
+            return;// nothing to update
         }
-        chart.sort((TrendingChartData t1, TrendingChartData t2)->t2.getyVal()-t1.getyVal());
-        return chart.subList(0,6);
+        int categoryID;
+        int tags;
+        if (insert == null) {
+            categoryID = TagAverageStore.getCategory((String) remove.get("category"));
+            tags = ((ArrayList<String>) remove.get("tags")).size();
+            tagAverageStore.get(categoryID).decrementVideoCount();
+            tagAverageStore.get(categoryID).decrementTotalTagCount(tags);
+            return;
+        }
+        if (remove == null) {
+            categoryID = TagAverageStore.getCategory((String) insert.get("category"));
+            tags = ((ArrayList<String>) insert.get("tags")).size();
+            tagAverageStore.get(categoryID).incrementVideoCount();
+            tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
+            return;
+        }
+        categoryID = TagAverageStore.getCategory((String) insert.get("category"));
+        tags = ((ArrayList<String>) insert.get("tags")).size();
+        tagAverageStore.get(categoryID).incrementVideoCount();
+        tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
+        categoryID = TagAverageStore.getCategory((String) remove.get("category"));
+        tags = ((ArrayList<String>) remove.get("tags")).size();
+        tagAverageStore.get(categoryID).decrementVideoCount();
+        tagAverageStore.get(categoryID).decrementTotalTagCount(tags);
     }
     //Needs update
 }
