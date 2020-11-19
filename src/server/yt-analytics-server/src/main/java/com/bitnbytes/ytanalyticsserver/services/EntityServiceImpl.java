@@ -57,7 +57,18 @@ public class EntityServiceImpl implements EntityService{
 
     @Override
     public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
-        return entityDatabase.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes, type);
+        long startTime = System.nanoTime();
+        List<TrendingChartData> random = entityDatabase.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes, type);
+        long endTime = System.nanoTime();
+
+        long duration = (endTime - startTime) / 1000000;
+        if(type.equals("Tags")){
+            System.out.println("Runtime of tag average category in milliseconds");
+            System.out.println(duration);
+            System.out.println("Runtime of tag average category");
+        }
+        return random;
+//        return entityDatabase.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes, type);
     }
 
     @Override

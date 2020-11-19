@@ -73,11 +73,13 @@ public class EntityManager {
     }
 
     public void removeEntityN(String videoID, String views) {
-        entitiesN.removeIf(entity -> entity.get("videoID").equals(videoID) && (int) entity.get("views") == Integer.parseInt(views));
+        Entity remove = entitiesN.stream().filter(entity -> entity.get("videoID").equals(videoID) && (int) entity.get("views") == Integer.parseInt(views)).findFirst().get();
+        updateTagAverageCategory(null, remove);
+        entitiesN.remove(remove);
     }
 
     public void insertEntity(String videoID, String trendingDate, String title, String channelTitle, String category, String publishTime, String tags, String views, String likes, String dislikes, String comments, String thumbnailLink, String commentsDisabled, String ratingsDisabled, String videoErrorOrRemoved, String description) {
-        System.out.println(entitiesN.size());
+//        System.out.println(entitiesN.size());
         DateTimeFormatter formatterTrendingDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter formatterPublishDate = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDate ptrendingDate = LocalDate.parse(trendingDate,formatterTrendingDate);
@@ -85,8 +87,10 @@ public class EntityManager {
         List<String> temp = Arrays.asList(tags.split("\\s*,\\s*"));
         ArrayList<String> ptags = new ArrayList<>(temp);
 
-        entitiesN.add(new Entity(videoID,ptrendingDate,title,channelTitle,category,ppublishTime,ptags,Integer.parseInt(views),Integer.parseInt(likes),Integer.parseInt(dislikes),Integer.parseInt(comments),thumbnailLink,commentsDisabled.equals("false"),ratingsDisabled.equals("false"),videoErrorOrRemoved.equals("false"),description));
-        System.out.println(entitiesN.size());
+        Entity newEntity = new Entity(videoID,ptrendingDate,title,channelTitle,category,ppublishTime,ptags,Integer.parseInt(views),Integer.parseInt(likes),Integer.parseInt(dislikes),Integer.parseInt(comments),thumbnailLink,commentsDisabled.equals("false"),ratingsDisabled.equals("false"),videoErrorOrRemoved.equals("false"),description);
+        updateTagAverageCategory(newEntity, null);
+        entitiesN.add(newEntity);
+//        System.out.println(entitiesN.size());
     }
 
     public void updateEntity(String videoID, String oldViews, String views, String likes, String dislikes) {
@@ -154,7 +158,7 @@ public class EntityManager {
 
         PriorityQueue<Map.Entry<String,Double>> topN = topN(topTrending, n);
 
-        System.out.println(topN.size());
+//        System.out.println(topN.size());
         List<Entity> realData = new ArrayList<>();
 
         while(topN.size() > 0){
@@ -335,6 +339,7 @@ public class EntityManager {
     public List<TrendingChartData> getTagAverageCategory() {
         List<TrendingChartData> chart = new ArrayList<>();
         if (tagAverageStore == null) {
+            System.out.println("Setting up cache for first time");
             tagAverageStore = new ArrayList<TagAverageStore>();
             int categoryID, tags;
             for (int i = 0; i < 45; i++) {
@@ -347,6 +352,9 @@ public class EntityManager {
                 tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
             }
         }
+
+        System.out.println("Incrementing");
+
         tagAverageStore.forEach(tas -> chart.add(new TrendingChartData(tas.getCategory(), tas.getTagAverage())));
         chart.sort((TrendingChartData t1, TrendingChartData t2) -> t2.getyVal() - t1.getyVal());
         return chart.subList(0, 6);
