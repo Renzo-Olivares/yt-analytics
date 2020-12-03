@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path="/ytanalytics")
@@ -25,13 +25,13 @@ public class EntityController {
     }
 
     @RequestMapping(value = "/entities", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getAllData(){
+    public ResponseEntity<Set<Entity>> getAllData(){
         System.out.println("Client requesting all data from server");
         return new ResponseEntity<>(entityService.getAllEntities(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/entitiesFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getFilteredData(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes){
+    public ResponseEntity<Set<Entity>> getFilteredData(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes){
         System.out.println("Client requesting filtered data from server");
         System.out.println(channelName);
         System.out.println(category);
@@ -93,13 +93,13 @@ public class EntityController {
     }
 
     @RequestMapping(value = "/analytics/topTrendingN/{n}", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getTopTrendingN(@PathVariable String n){
+    public ResponseEntity<Set<Entity>> getTopTrendingN(@PathVariable String n){
         System.out.println("Client requesting all data from server");
         return new ResponseEntity<>(entityService.getTopTrendingN(n), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/analyticsFiltered/channel/{channelName}/category/{category}/commentsDisabled/{commentsDisabled}/videoName/{videoName}/views/{minViews}/likes/{minLikes}/dislikes/{minDislikes}/type/{type}", method = RequestMethod.GET)
-    public ResponseEntity<List<TrendingChartData>> getFilteredAnalytics(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes, @PathVariable String type){
+    public ResponseEntity<Set<TrendingChartData>> getFilteredAnalytics(@PathVariable String channelName, @PathVariable String category, @PathVariable String commentsDisabled, @PathVariable String videoName, @PathVariable String minViews, @PathVariable String minLikes, @PathVariable String minDislikes, @PathVariable String type){
         System.out.println("Client requesting filtered analytics from server");
 //        System.out.println(channelName);
 //        System.out.println(category);
@@ -112,7 +112,7 @@ public class EntityController {
     }
 
     @RequestMapping(value = "/analytics/trendingdays/{days}", method = RequestMethod.GET)
-    public ResponseEntity<List<Entity>> getAllData(@PathVariable String days){
+    public ResponseEntity<Set<Entity>> getAllData(@PathVariable String days){
         System.out.println("Client trending n days");
         return new ResponseEntity<>(entityService.getTrendingNDays(days), HttpStatus.OK);
     }

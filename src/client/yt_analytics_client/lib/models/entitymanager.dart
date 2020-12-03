@@ -91,6 +91,129 @@ class EntityManager with ChangeNotifier {
     notifyListeners();
   }
 
+  void loadTrendingChannelsAnalytics(
+    String category,
+    String commentsDisabled,
+    String videoName,
+    String views,
+    String likes,
+    String dislikes,
+    String channelName,
+  ) {
+    if ((category == '' || category == 'None') &&
+        commentsDisabled == 'null' &&
+        videoName == '' &&
+        views == '' &&
+        likes == '' &&
+        dislikes == '' &&
+        channelName == '') {
+      _trendingChannels = api.getFilteredAnalytics(
+        category: '',
+        commentsDisabled: '',
+        videoName: '',
+        views: '',
+        likes: '',
+        dislikes: '',
+        channelName: '',
+        type: 'Channels',
+      );
+    } else {
+      _trendingChannels = api.getFilteredAnalytics(
+        category: category,
+        commentsDisabled: commentsDisabled,
+        videoName: videoName,
+        views: views,
+        likes: likes,
+        dislikes: dislikes,
+        channelName: channelName,
+        type: 'Channels',
+      );
+    }
+    notifyListeners();
+  }
+
+  void loadTrendingCategoriesAnalytics(
+    String category,
+    String commentsDisabled,
+    String videoName,
+    String views,
+    String likes,
+    String dislikes,
+    String channelName,
+  ) {
+    if ((category == '' || category == 'None') &&
+        commentsDisabled == 'null' &&
+        videoName == '' &&
+        views == '' &&
+        likes == '' &&
+        dislikes == '' &&
+        channelName == '') {
+      _trendingCategories = api.getFilteredAnalytics(
+        category: '',
+        commentsDisabled: '',
+        videoName: '',
+        views: '',
+        likes: '',
+        dislikes: '',
+        channelName: '',
+        type: 'Categories',
+      );
+    } else {
+      _trendingCategories = api.getFilteredAnalytics(
+        category: category,
+        commentsDisabled: commentsDisabled,
+        videoName: videoName,
+        views: views,
+        likes: likes,
+        dislikes: dislikes,
+        channelName: channelName,
+        type: 'Categories',
+      );
+    }
+    notifyListeners();
+  }
+
+  void loadAvgTagsCategoriesAnalytics(
+    String category,
+    String commentsDisabled,
+    String videoName,
+    String views,
+    String likes,
+    String dislikes,
+    String channelName,
+  ) {
+    if ((category == '' || category == 'None') &&
+        commentsDisabled == 'null' &&
+        videoName == '' &&
+        views == '' &&
+        likes == '' &&
+        dislikes == '' &&
+        channelName == '') {
+      _avgTagsCategories = api.getFilteredAnalytics(
+        category: '',
+        commentsDisabled: '',
+        videoName: '',
+        views: '',
+        likes: '',
+        dislikes: '',
+        channelName: '',
+        type: 'Tags',
+      );
+    } else {
+      _avgTagsCategories = api.getFilteredAnalytics(
+        category: category,
+        commentsDisabled: commentsDisabled,
+        videoName: videoName,
+        views: views,
+        likes: likes,
+        dislikes: dislikes,
+        channelName: channelName,
+        type: 'Tags',
+      );
+    }
+    notifyListeners();
+  }
+
   void loadFilteredAnalytics(
     String category,
     String commentsDisabled,
@@ -169,6 +292,17 @@ class EntityManager with ChangeNotifier {
       dislikes: '',
       channelName: '',
       type: 'Categories',
+    );
+
+    _avgTagsCategories = api.getFilteredAnalytics(
+      category: '',
+      commentsDisabled: '',
+      videoName: '',
+      views: '',
+      likes: '',
+      dislikes: '',
+      channelName: '',
+      type: 'Tags',
     );
 
     notifyListeners();

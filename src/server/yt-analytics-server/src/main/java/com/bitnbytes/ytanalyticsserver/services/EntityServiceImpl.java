@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 @Component
 public class EntityServiceImpl implements EntityService{
@@ -20,12 +20,12 @@ public class EntityServiceImpl implements EntityService{
     }
 
     @Override
-    public List<Entity> getAllEntities() {
+    public Set<Entity> getAllEntities() {
         return entityDatabase.getAllEntities();
     }
 
     @Override
-    public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes) {
+    public Set<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes) {
         return entityDatabase.getEntitiesByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
     }
 
@@ -56,9 +56,9 @@ public class EntityServiceImpl implements EntityService{
     }
 
     @Override
-    public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
+    public Set<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
         long startTime = System.nanoTime();
-        List<TrendingChartData> random = entityDatabase.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes, type);
+        Set<TrendingChartData> random = entityDatabase.getAnalyticsByFilter(channelName, category, commentsDisabled, videoName, views, likes, dislikes, type);
         long endTime = System.nanoTime();
 
         long duration = (endTime - startTime) / 1000000;
@@ -72,12 +72,12 @@ public class EntityServiceImpl implements EntityService{
     }
 
     @Override
-    public List<Entity> getTopTrendingN(String n) {
+    public Set<Entity> getTopTrendingN(String n) {
         return entityDatabase.getTopTrendingByLikeDislikeRatio(Integer.parseInt(n));
     }
 
     @Override
-    public List<Entity> getTrendingNDays(String days) {
+    public Set<Entity> getTrendingNDays(String days) {
         return entityDatabase.getTrendingNDays(Integer.parseInt(days));
     }
 }

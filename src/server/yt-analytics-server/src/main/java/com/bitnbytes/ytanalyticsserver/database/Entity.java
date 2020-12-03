@@ -59,7 +59,7 @@ public class Entity extends LinkedHashMap<String, Object> {
         this.put("description",description);
     }
 
-    private String getCategory(int categoryID) {
+    public static String getCategory(int categoryID) {
         switch (categoryID) {
             case 1:
                 return "Film & Animation";

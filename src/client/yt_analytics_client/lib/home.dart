@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-        elevation: 0,
+        elevation: 2,
         title: const SearchBar(),
       ),
       body: Row(

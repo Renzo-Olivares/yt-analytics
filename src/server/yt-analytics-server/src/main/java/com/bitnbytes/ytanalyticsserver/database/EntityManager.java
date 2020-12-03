@@ -32,13 +32,13 @@ public class EntityManager {
         loadData("/home/renzo/USvideos.csv");
     }
 
-    public List<Entity> getAllEntities(){
-        return new ArrayList<>(entitiesN);
+    public Set<Entity> getAllEntities(){
+        return entitiesN;
     }
 
 
-    public List<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
-        return entitiesN.stream().filter(e -> filter(e, channelName, category, commentsDisabled, videoName, views, likes, dislikes)).collect(Collectors.toList());
+    public Set<Entity> getEntitiesByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
+        return entitiesN.stream().filter(e -> filter(e, channelName, category, commentsDisabled, videoName, views, likes, dislikes)).collect(Collectors.toSet());
     }
 
     private boolean filter(Entity entity, String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes){
@@ -139,13 +139,12 @@ public class EntityManager {
         loadData(parsedFilePath);
     }
 
-	public List<Entity> getTopTrendingByLikeDislikeRatio(int n) {
-        List<Entity> sortedList = getTopTrendingByLikeDislikeRatioHelper(n);
-        if(n > sortedList.size())return sortedList;
-		return sortedList.subList(0, n);
+	public Set<Entity> getTopTrendingByLikeDislikeRatio(int n) {
+        Set<Entity> sortedList = getTopTrendingByLikeDislikeRatioHelper(n);
+		return sortedList;
     }
 
-    public List<Entity> getTopTrendingByLikeDislikeRatioHelper(int n) {
+    public Set<Entity> getTopTrendingByLikeDislikeRatioHelper(int n) {
         Map<String, Double> topTrending = new HashMap<>();
 
         for(Entity entity : entitiesN){
@@ -159,18 +158,17 @@ public class EntityManager {
         PriorityQueue<Map.Entry<String,Double>> topN = topN(topTrending, n);
 
 //        System.out.println(topN.size());
-        List<Entity> realData = new ArrayList<>();
+        Set<Entity> realData = new LinkedHashSet<>();
 
         while(topN.size() > 0){
             Map.Entry<String, Double> single = topN.poll();
-            realData.add(entitiesN.stream().filter(e -> ((String) e.get("videoID")).contains(single.getKey())).findFirst().get());
+            realData.add(entitiesN.stream().filter(e -> ((String) e.get("videoID")).contains(single.getKey())).findFirst().orElse(null));
         }
-
 
         return realData;
     }
 
-    public List<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
+    public Set<TrendingChartData> getAnalyticsByFilter(String channelName, String category, String commentsDisabled, String videoName, String views, String likes, String dislikes, String type) {
         if(type.equals("Tags") && tagAverageStore == null){
             loadFilteredSet(channelName, category, commentsDisabled, videoName, views, likes, dislikes);
         }else if(!type.equals("Tags")){
@@ -190,7 +188,7 @@ public class EntityManager {
         filteredSet = entitiesN.stream().filter(e -> filter(e, channelName, category, commentsDisabled, videoName, views, likes, dislikes)).collect(Collectors.toSet());
     }
 
-    public List<TrendingChartData> getTopTrendingChannels() {
+    public Set<TrendingChartData> getTopTrendingChannels() {
         Map<String, Integer> topChannels = new HashMap<>();
 
         for(Entity entity : filteredSet){
@@ -204,9 +202,9 @@ public class EntityManager {
         return getTrendingChartData(topChannels);
     }
 
-    private List<TrendingChartData> getTrendingChartData(Map<String, Integer> topChannels) {
+    private Set<TrendingChartData> getTrendingChartData(Map<String, Integer> topChannels) {
         PriorityQueue<Map.Entry<String,Integer>> topN = topN(topChannels, 6);
-        List<TrendingChartData> realData = new ArrayList<>();
+        Set<TrendingChartData> realData = new LinkedHashSet<>();
 
         while(topN.size() > 0){
             Map.Entry<String, Integer> single = topN.poll();
@@ -235,99 +233,32 @@ public class EntityManager {
         return top;
     }
 
-    public List<TrendingChartData> getTopTrendingCategories() {
+    public Set<TrendingChartData> getTopTrendingCategories() {
         Map<String, Integer> topCategories = new HashMap<>();
-            for (int i = 1; i < 33; i++) {
-                switch (i) {
-                    case 1:
-                        topCategories.put("Film & Animation", 0);
-                    case 2:
-                        topCategories.put("Autos & Vehicles", 0);
-                    case 3:
-                        topCategories.put("Music", 0);
-                    case 4:
-                        topCategories.put("Pets & Animals", 0);
-                    case 5:
-                        topCategories.put("Sports", 0);
-                    case 6:
-                        topCategories.put("Short Movies", 0);
-                    case 7:
-                        topCategories.put("Travel & Events", 0);
-                    case 8:
-                        topCategories.put("Gaming", 0);
-                    case 9:
-                        topCategories.put("Videoblogging", 0);
-                    case 10:
-                        topCategories.put("People & Blogs", 0);
-                    case 11:
-                        topCategories.put("Comedy", 0);
-                    case 12:
-                        topCategories.put("Entertainment", 0);
-                    case 13:
-                        topCategories.put("News & Politics", 0);
-                    case 14:
-                        topCategories.put("Howto & Style", 0);
-                    case 15:
-                        topCategories.put("Education", 0);
-                    case 16:
-                        topCategories.put("Science & Technology", 0);
-                    case 17:
-                        topCategories.put("Nonprofits & Activism", 0);
-                    case 18:
-                        topCategories.put("Movies", 0);
-                    case 19:
-                        topCategories.put("Anime/Animation", 0);
-                    case 20:
-                        topCategories.put("Action/Adventure", 0);
-                    case 21:
-                        topCategories.put("Classics", 0);
-                    case 22:
-                        topCategories.put("Comedy", 0);
-                    case 23:
-                        topCategories.put("Documentary", 0);
-                    case 24:
-                        topCategories.put("Drama", 0);
-                    case 25:
-                        topCategories.put("Family", 0);
-                    case 26:
-                        topCategories.put("Foreign", 0);
-                    case 27:
-                        topCategories.put("Horror", 0);
-                    case 28:
-                        topCategories.put("Sci-Fi/Fantasy", 0);
-                    case 29:
-                        topCategories.put("Thriller", 0);
-                    case 30:
-                        topCategories.put("Shorts", 0);
-                    case 31:
-                        topCategories.put("Shows", 0);
-                    case 32:
-                        topCategories.put("Trailers", 0);
-                    default:
-                        topCategories.put("ERROR", 0);
-                }
-
-            }
 
         for(Entity entity : filteredSet){
-            topCategories.put((String) entity.get("category"), topCategories.get(entity.get("category")) + 1);
+            if(!topCategories.containsKey(entity.get("category"))){
+                topCategories.put((String) entity.get("category"), 1);
+            }else{
+                topCategories.put((String) entity.get("category"), topCategories.get(entity.get("category")) + 1);
+            }
         }
 
         return getTrendingChartData(topCategories);
     }
 
-    public List<Entity> getTrendingNDays(int n){
+    public Set<Entity> getTrendingNDays(int n){
         Map<String, Integer> topVideos = new HashMap<>();
 
         for(Entity entity : entitiesN){
             if(topVideos.containsKey(entity.get("videoID"))){
                 topVideos.put((String) entity.get("videoID"), topVideos.get(entity.get("videoID")) + 1);
             }else{
-                topVideos.put((String) entity.get("videoID"), 0);
+                topVideos.put((String) entity.get("videoID"), 1);
             }
         }
 
-        List<Entity> realData = new ArrayList<>();
+        Set<Entity> realData = new LinkedHashSet<>();
         for(Map.Entry<String,Integer> compressedEntity: topVideos.entrySet()){
             if(compressedEntity.getValue() == n){
                 realData.add(entitiesN.stream().filter(e -> e.get("videoID").equals(compressedEntity.getKey())).findFirst().get());
@@ -337,22 +268,24 @@ public class EntityManager {
         return realData;
     }
 
-    private List<TagAverageStore> tagAverageStore;
+    private Map<Integer, TagAverageStore> tagAverageStore;
 
 
-    //Needs update
-    public List<TrendingChartData> getTagAverageCategory() {
-        List<TrendingChartData> chart = new ArrayList<>();
+    public Set<TrendingChartData> getTagAverageCategory() {
+        Set<TrendingChartData> chart = new LinkedHashSet<>();
         if (tagAverageStore == null) {
             System.out.println("Setting up cache for first time");
-            tagAverageStore = new ArrayList<TagAverageStore>();
+            tagAverageStore = new HashMap<>();
             int categoryID, tags;
-            for (int i = 0; i < 45; i++) {
-                tagAverageStore.add(new TagAverageStore(0, 0, i));
-            }
+
             for (Entity e : this.filteredSet) {
-                categoryID = TagAverageStore.getCategory((String)e.get("category"));
+                categoryID = e.getCategoryId((String) e.get("category"));
                 tags = ((ArrayList<String>) e.get("tags")).size();
+
+                if(!tagAverageStore.containsKey(categoryID)){
+                    tagAverageStore.put(categoryID, new TagAverageStore(0,0,categoryID));
+                }
+
                 tagAverageStore.get(categoryID).incrementVideoCount();
                 tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
             }
@@ -360,9 +293,17 @@ public class EntityManager {
 
         System.out.println("Incrementing");
 
-        tagAverageStore.forEach(tas -> chart.add(new TrendingChartData(tas.getCategory(), tas.getTagAverage())));
-        chart.sort((TrendingChartData t1, TrendingChartData t2) -> t2.getyVal() - t1.getyVal());
-        return chart.subList(0, 6);
+        tagAverageStore.forEach((key, value) -> chart.add(new TrendingChartData(value.getCategory(), value.getTagAverage())));
+
+        List<TrendingChartData> temp = new ArrayList<>(chart);
+        temp.sort((TrendingChartData t1, TrendingChartData t2) -> t2.getyVal() - t1.getyVal());
+        if(temp.size() > 6){
+            temp = temp.subList(0,6);
+        }
+        Collections.reverse(temp);
+        chart.clear();
+        chart.addAll(temp);
+        return chart;
     }
 
     private void updateTagAverageCategory(Entity insert, Entity remove) {
@@ -372,24 +313,24 @@ public class EntityManager {
         int categoryID;
         int tags;
         if (insert == null) {
-            categoryID = TagAverageStore.getCategory((String) remove.get("category"));
+            categoryID = remove.getCategoryId((String) remove.get("category"));
             tags = ((ArrayList<String>) remove.get("tags")).size();
             tagAverageStore.get(categoryID).decrementVideoCount();
             tagAverageStore.get(categoryID).decrementTotalTagCount(tags);
             return;
         }
         if (remove == null) {
-            categoryID = TagAverageStore.getCategory((String) insert.get("category"));
+            categoryID = insert.getCategoryId((String) insert.get("category"));
             tags = ((ArrayList<String>) insert.get("tags")).size();
             tagAverageStore.get(categoryID).incrementVideoCount();
             tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
             return;
         }
-        categoryID = TagAverageStore.getCategory((String) insert.get("category"));
+        categoryID = insert.getCategoryId((String) insert.get("category"));
         tags = ((ArrayList<String>) insert.get("tags")).size();
         tagAverageStore.get(categoryID).incrementVideoCount();
         tagAverageStore.get(categoryID).incrementTotalTagCount(tags);
-        categoryID = TagAverageStore.getCategory((String) remove.get("category"));
+        categoryID = remove.getCategoryId((String) remove.get("category"));
         tags = ((ArrayList<String>) remove.get("tags")).size();
         tagAverageStore.get(categoryID).decrementVideoCount();
         tagAverageStore.get(categoryID).decrementTotalTagCount(tags);

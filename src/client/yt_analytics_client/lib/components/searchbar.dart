@@ -27,6 +27,10 @@ class _SearchBarState extends State<SearchBar> {
               child: TextField(
                 controller: _searchBarController,
                 enabled: routemodel.route == 'About' ? false : true,
+                onChanged: (value) {
+                  Provider.of<FilterManager>(context, listen: false).videoName =
+                      value;
+                },
                 decoration: InputDecoration(
                   filled: true,
                   enabled: routemodel.route == 'About' ? false : true,
@@ -62,7 +66,7 @@ class _SearchBarState extends State<SearchBar> {
                           model.channelName,
                         );
                         Provider.of<EntityManager>(context, listen: false)
-                            .setTopTrendingN('10');
+                            .setTopTrendingN(model.trendingN);
                         Provider.of<EntityManager>(context, listen: false)
                             .setTrendingNDays(model.numofdays);
                       } else if (Provider.of<RouteManager>(context,

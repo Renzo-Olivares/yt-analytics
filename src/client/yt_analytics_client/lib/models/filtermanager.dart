@@ -9,6 +9,7 @@ class FilterManager with ChangeNotifier {
   String _dislikes = '';
   String _channelName = '';
   String _numDays = '10';
+  String _trendingN = '10';
 
   String get category => _category;
   bool get commentsDisabled => _commentsDisabled;
@@ -18,6 +19,7 @@ class FilterManager with ChangeNotifier {
   String get dislikes => _dislikes;
   String get channelName => _channelName;
   String get numofdays => _numDays;
+  String get trendingN => _trendingN;
 
   set category(String category) {
     _category = category;
@@ -31,6 +33,11 @@ class FilterManager with ChangeNotifier {
 
   set numofdays(String value) {
     _numDays = value;
+    notifyListeners();
+  }
+
+  set trendingN(String value) {
+    _trendingN = value;
     notifyListeners();
   }
 
@@ -67,6 +74,8 @@ class FilterManager with ChangeNotifier {
     _likes = '';
     _dislikes = '';
     _channelName = '';
+    _numDays = '10';
+    _trendingN = '10';
     notifyListeners();
   }
 }
